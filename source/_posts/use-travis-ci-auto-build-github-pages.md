@@ -8,9 +8,11 @@ tags:
 
 ---
 
-之前使用 [**hexo**](https://hexo.io/) 搭建自己的Github pages, 配置了很久的 [**next**](http://theme-next.iissnan.com/) 主题, 写了一段时间的文章，感觉棒棒的。 但是后面换了电脑，忘记备份数据，所有的markdown文件也没有push到Github上，因为这些原因我就没有写过了。
+> 之前使用 [**hexo**](https://hexo.io/) 搭建自己的Github pages, 配置了很久的 [**next**](http://theme-next.iissnan.com/) 主题, 写了一段时间的文章，感觉棒棒的。 但是后面换了电脑，忘记备份数据，所有的markdown文件也没有push到Github上，因为这些原因我就没有写过了。
 
-最近打算重新拾起写文章记录的习惯，因为只有不断的总结也能更好的理解学习。考虑到之前遇到的问题，加上有过gitlab ci的使用经验，决定使用 [travis-ci](https://travis-ci.org) 自动构建github主页。
+> 最近打算重新拾起写文章记录的习惯，因为只有不断的总结才能更好的理解学习。考虑到之前遇到的问题，加上有过gitlab ci的使用经验，决定使用 [travis-ci](https://travis-ci.org) 自动构建github主页。
+
+<!-- more -->
 
 ## travis-ci使用
 

@@ -15,6 +15,8 @@ categories:
 ERROR:  You must add /O=Digital Signature Trust Co./CN=DST Root CA X3 to your local trusted store
 ```
 
+<!-- more -->
+
 解决方案:
 
 - 首先要安装Homebrew终端输入这条命令即可 

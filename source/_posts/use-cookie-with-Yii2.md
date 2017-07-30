@@ -17,6 +17,8 @@ categories:
 
 其中**request**处理`cookie`的逻辑是:
 
+<!-- more -->
+
 ```php
 <?php
 protected function loadCookies()
@@ -50,8 +52,6 @@ protected function loadCookies()
 ```
 
 这里**request**从`PHP`的全局变量`$_COOKIE`中获取客户端传的`cookie`, 构造`yii\web\Cookie`对象，而**这个对象只有name和value属性赋值了**
-
-<!-- more -->
 
 **response**中处理`cookie`的逻辑是:
 

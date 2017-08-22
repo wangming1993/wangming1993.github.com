@@ -1,5 +1,5 @@
 ---
-title: 关于 `PHP`, 我到底理解了什么
+title: 关于PHP, 我学到了什么
 date: 2017-08-22 19:01:52
 tags:
 - php
@@ -31,6 +31,8 @@ use Aliyun_Log_Client;
 
 1. `spl_autoload_register` 注册一个解析 `class` 名的函数
 2. 根据 `class` 名找到对应的 `php` 文件并调用 `require`
+
+<!-- more -->
 
 这里看 `Aliyun_Log` 是如何实现的:
 

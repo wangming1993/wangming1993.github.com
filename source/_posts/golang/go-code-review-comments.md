@@ -1,5 +1,5 @@
 ---
-title: go code review comments 【译文
+title: go code review comments 【译文】
 date: 2016-12-05 21:07:14
 tags:
 - golang

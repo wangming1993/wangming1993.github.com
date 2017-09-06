@@ -6,19 +6,18 @@ branches:
 before_install:
 - npm install -g hexo
 - npm install -g hexo-cli
-- "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""
 install:
 - npm install
 script:
-- git clone -b master https://github.com/wangming1993/wangming1993.github.com.git public
+- hexo clean
 - hexo generate
 after_success:
   - cd ./public
-  #- git init
+  - git init
   - git config --global user.name 'wangming1993'
   - git config --global user.email 'wangming19932008@163.com'
   - git add .
-  - git commit -m ${TRAVIS_COMMIT_MSG}
+  - git commit -m "generate static resources, triggerd by travis ci"
   - git push --force "https://wangming1993:${REPO_TOKEN}@${GH_REF}" master:master
 env:
   global:

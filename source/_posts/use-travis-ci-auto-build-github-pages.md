@@ -76,7 +76,7 @@ env:
 
 这里需要着重介绍一下push文件到Github的过程，我使用:
 ```shell
-it push --force "https://wangming1993:${REPO_TOKEN}@${GH_REF}"
+git push --force "https://wangming1993:${REPO_TOKEN}@${GH_REF}"
 ```
 
 - `wangming1993`

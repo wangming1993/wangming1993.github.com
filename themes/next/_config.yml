@@ -92,7 +92,7 @@ scheme: Pisces
 # Social links
 social:
   GitHub: https://github.com/wangming1993
-  知乎: http://www.zhihu.com/people/mike_1993
+  微博: https://www.weibo.com/6094203318/profile
 
 # Social Links Icons
 # Icon Mapping:
@@ -104,7 +104,7 @@ social_icons:
   # Icon Mappings.
   # KeyMapsToSocialItemKey: NameOfTheIconFromFontAwesome
   GitHub: github
-  知乎: wechat
+  微博: weibo
 
 # Blog rolls
 #links_title: Links

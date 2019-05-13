@@ -2,7 +2,7 @@
 title: go code review comments 【译文】
 date: 2016-12-05 21:07:14
 tags:
-- golang
+- Go
 - coding style
 ---
 
@@ -19,7 +19,7 @@ tags:
 前者会避免内存分配，除非使用了`append()`
 
 ## 不要使用`panic`
-对于普通的错误处理，不要使用`panic`,使用error和多返回值， 
+对于普通的错误处理，不要使用`panic`,使用error和多返回值，
 - 参考：https://golang.org/doc/effective_go.html#errors
 
 <!-- more -->

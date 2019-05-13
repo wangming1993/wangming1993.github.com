@@ -2,7 +2,7 @@
 title: golang 的分片
 date: 2017-08-20 22:30:06
 tags:
-- golang
+- Go
 
 categories:
 - golang
@@ -70,7 +70,7 @@ fmt.Println("source-->", source)
 fmt.Println("copied-->", copied)
 ```
 
-输出： 
+输出：
 
 ```shell
 source--> [1 2 3 4 5]
@@ -102,7 +102,7 @@ fmt.Println("source-->", source)
 fmt.Println("copied-->", copied)
 ```
 
-输出： 
+输出：
 
 ```go
 source--> [1 2 3 4 5]
@@ -111,6 +111,3 @@ copied--> [3]
 source--> [1 2 3 4 5]
 copied--> [3 mike]
 ```
-
-
-

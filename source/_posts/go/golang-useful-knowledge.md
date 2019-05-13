@@ -2,7 +2,7 @@
 title: go有用的使用方式
 date: 2016-09-08 20:56:49
 tags:
-- golang
+- Go
 ---
 
 > - http://lib.csdn.net/base/go/structure   go知识总结
@@ -30,7 +30,7 @@ reflect.TypeOf(i)
 ```
 
 - **关于defer**
-  
+
   defer采用的是**LIFO**,即栈的实现方式
 
 - **数组，切片, Map的区别**
@@ -41,7 +41,7 @@ reflect.TypeOf(i)
 - **方法调用**
   - 值方法可以在指针和值上进行调用
   - 指针方法只能在指针上调用
-  
+
 ## 获取goroot, gopath, version
 
 ``` go
@@ -54,4 +54,3 @@ fmt.Println(os.Environ())
 fmt.Println(runtime.GOARCH, runtime.GOOS, runtime.GOROOT(), runtime.Version())
 
 ```
-

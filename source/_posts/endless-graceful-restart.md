@@ -2,7 +2,7 @@
 title: endless是如何实现graceful restart
 date: 2017-02-14 21:12:45
 tags:
-- golang
+- Go
 ---
 
 > - https://grisha.org/blog/2014/06/03/graceful-restart-in-golang/
@@ -39,4 +39,3 @@ kill时的数字对应信号信息如下:
 ![image](https://cloud.githubusercontent.com/assets/5611286/22914948/b8f28784-f2ae-11e6-9f5c-a760110f0e78.png)
 
 所以很容易理解`kill -9 $pid`强制杀死`$pid`进程其实就是发送`KILL`信号给`$pid`进程。
-

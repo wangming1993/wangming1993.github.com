@@ -2,10 +2,10 @@
 title: golang升级到1.7过程中使用gorequest碰到的问题
 date: 2016-08-19 20:52:27
 tags:
-- golang
+- Go
 ---
 
-go在1.6的版本中加入了 `Detection of unsafe concurrent access to maps`, 
+go在1.6的版本中加入了 `Detection of unsafe concurrent access to maps`,
 考虑下面的代码:
 
 ```golang
@@ -130,7 +130,7 @@ type SuperAgent struct {
 }
 ```
 
-注意到**Data**这个属性， 是一个 map, 
+注意到**Data**这个属性， 是一个 map,
 
 ```golang
 func (s *SuperAgent) SendString(content string) *SuperAgent {

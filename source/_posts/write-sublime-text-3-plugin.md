@@ -9,11 +9,12 @@ tags:
 > https://clarknikdelpowell.com/blog/creating-sublime-text-3-plugins-part-1/
 
 Sublime Text 3 (**ST3**)　作为我工作之后的唯一编辑器，　已经彻底征服了我的心，它非凡的性能变现以及众多插件的扩展性，已经让我欲罢不能了．每一个独特功能的插件都加速了我的日常工作，这使我萌生了自定义插件的想法．
-<!-- more --> 
+<!-- more -->
 
 ## 关于插件
 
 **ST3**的插件以文件的形式组织，它会在3个目录搜索插件:
+
 - Installed Packages
 - Packages
 - Packages/pkg_name/
@@ -32,6 +33,7 @@ Sublime Text 3 (**ST3**)　作为我工作之后的唯一编辑器，　已经�
 ### 添加插件
 
 首先新建一个插件
+
 1. 点击　`Perferences` -> `Browse Packages...`, 在打开的文件夹下面新建一个目录：`Mike`;
 2. 点击　`Tools` -> `New Plugin...`，将文件保存到插件目录 `Mike` 下面，取名为: `mike.py`, 修改文件内容如下：
 
@@ -58,6 +60,7 @@ view.run_command("mike")
 
 在插件的目录`Mike`下面新建文件:  `Default (Linux).sublime-keymap`,
 表示在Linux下面的快捷键设置，当然也可以为不同平台指定快捷键，具体支持如下:
+
 - Default (Windows).sublime-keymap
 - Default (OSX).sublime-keymap
 - Default (Linux).sublime-keymap
@@ -80,6 +83,7 @@ view.run_command("mike")
 ### 为插件添加菜单
 
 **ST3**支持３种类型的菜单：
+
 - Main.sublime-menu
   既所谓的顶部菜单，位于**ST3**菜单栏具体菜单下
 - Side Bar.sublime-menu
@@ -135,7 +139,8 @@ view.run_command("mike")
 效果为：在文字区域右键有一个 `Mike Wang`的菜单项
 
 很明显，这些文件都是以 json 数组的形式组织的，其内容表现为：
-- id 
+
+- id
   每一个菜单项的唯一标识
 - caption
   相当于菜单的一个展示名称，所看到的效果
@@ -143,6 +148,7 @@ view.run_command("mike")
   大小写敏感，所要执行的命令
 - children
   用于定义子菜单
+
 ## 总结
 
 到这里，一个简单的 **ST3** 插件就定义完毕，这里只是表现了一个插件的组织结构，并不具备什么有用的功能，因为这里并没有结合 **ST3** 的 API . 但千里之行始于足下，具备了完整的结构才可以继续开展壮大起来．

@@ -7,8 +7,10 @@ tags:
 - Yii2
 ---
 
-**遵循PSR-2编码规范**
 ## 概览
+
+> **遵循PSR-2编码规范**
+
 1. 文件必须使用　`<?php` 或者　`<?=`　标签
 2. 文件的结尾必须是一个空行
 3. 文件编码格式必须是**不带BOM的UTF-8格式**
@@ -128,7 +130,7 @@ double getPayAmount() {
     };
   }
   return result;
-};  
+};
 ```
 
 ``` php
@@ -138,7 +140,7 @@ double getPayAmount() {
   if (_isSeparated) return separatedAmount();
   if (_isRetired) return retiredAmount();
   return normalPayAmount();
-};  
+};
 ```
 
 ### 匿名函数声明

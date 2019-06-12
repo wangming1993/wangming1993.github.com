@@ -9,7 +9,6 @@ tags:
 ---
 
 > 之前使用 [**hexo**](https://hexo.io/) 搭建自己的Github pages, 配置了很久的 [**next**](http://theme-next.iissnan.com/) 主题, 写了一段时间的文章，感觉棒棒的。 但是后面换了电脑，忘记备份数据，所有的markdown文件也没有push到Github上，因为这些原因我就没有写过了。
-
 > 最近打算重新拾起写文章记录的习惯，因为只有不断的总结才能更好的理解学习。考虑到之前遇到的问题，加上有过gitlab ci的使用经验，决定使用 [travis-ci](https://travis-ci.org) 自动构建github主页。
 
 <!-- more -->
@@ -19,12 +18,12 @@ tags:
 ### travis-ci设置
 
 打开[travis-ci](https://travis-ci.org/)主页，选择右上角的 `Sign in with Github`, 使用你的 Github账号登录，进入你的accounts页面：
-![accounts](http://otuvs4s36.bkt.clouddn.com/travis-ci-setting.png)
+![accounts](http://cdn.jokingus.com/travis-ci-setting.png)
 
-选择你要使用travis-ci构建的Github repository, 这里我开启的是： `wangming1993.github.com` 
-![wangming1993.github.com](http://otuvs4s36.bkt.clouddn.com/wangming1993-github-com.png)
+选择你要使用travis-ci构建的Github repository, 这里我开启的是： `wangming1993.github.com`
+![wangming1993.github.com](http://cdn.jokingus.com/wangming1993-github-com.png)
 
-点击右下角的`More options` ![More options](http://otuvs4s36.bkt.clouddn.com/more-options.png)， 进入repository的setting页面： ![setting](http://otuvs4s36.bkt.clouddn.com/setting.png), 做一些设置，如：只有存在`.travis.yml`文件时才会触发自动build。
+点击右下角的`More options` ![More options](http://cdn.jokingus.com/more-options.png)， 进入repository的setting页面： ![setting](http://cdn.jokingus.com/setting.png), 做一些设置，如：只有存在`.travis.yml`文件时才会触发自动build。
 
 ### travis-ci配置文件
 
@@ -81,7 +80,7 @@ git push --force "https://wangming1993:${REPO_TOKEN}@${GH_REF}"
 
 - `wangming1993`
     - 这是我的Github ID
-- `${REPO_TOKEN}` 
+- `${REPO_TOKEN}`
     - Github的Personal access tokens， 因为这个涉及到安全性，不能push到Github,所以这个环境变量我是在travis-ci里面配置的
 - `{GH_REF}`
     - 指定你push的Github repository, 配置的`.travis.yml`文件的env中
@@ -92,6 +91,6 @@ git push --force "https://wangming1993:${REPO_TOKEN}@${GH_REF}"
 
 首先明确的是这个环境变量的作用域是在你的具体repository中的，如我的repository是:`wangming1993.github.com`, 那么就需要在这个repository的**setting**里面进行配置：
 
-![env setting](http://otuvs4s36.bkt.clouddn.com/env-setting.png)
+![env setting](http://cdn.jokingus.com/env-setting.png)
 
-而关于Personal access tokens,你需要在你的Github中生成， 访问： https://github.com/settings/tokens/new ， 选择权限 ![scopes](http://otuvs4s36.bkt.clouddn.com/select-scopes.png) （PS: 我是勾选的全部权限). 然后将会生成一个token.
+而关于Personal access tokens,你需要在你的Github中生成， 访问： https://github.com/settings/tokens/new ， 选择权限 ![scopes](http://cdn.jokingus.com/select-scopes.png) （PS: 我是勾选的全部权限). 然后将会生成一个token.

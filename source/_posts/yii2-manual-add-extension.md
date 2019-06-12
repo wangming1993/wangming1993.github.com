@@ -5,7 +5,7 @@ tags:
 - Yii2
 ---
 
-# Yii2手动添加扩展模块 mongodb, 非composer方式
+## Yii2手动添加扩展模块 mongodb, 非composer方式
 
 > 因为某些原因, 国内composer方式难以成功, 你懂的 , 而Yii2 的官方推荐就是使用composer的方式安装第三法扩展
 

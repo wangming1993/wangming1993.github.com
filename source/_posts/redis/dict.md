@@ -51,7 +51,7 @@ typedef struct dict {
 
 结构示意图：
 
-![redis-dict](http://otuvs4s36.bkt.clouddn.com/redis-dict.png)
+![redis-dict](http://cdn.jokingus.com/redis-dict.png)
 
 <!-- more -->
 
@@ -78,7 +78,7 @@ hash = dict->type->hashFunction(k);
 然后根据 `sizemask` 求出索引值:
 
 ```c
- index = hash & dict->ht[x]->sizemask;   
+ index = hash & dict->ht[x]->sizemask;
  // x 表示实际存放哈希表的索引， 一般为 0 ，当在进行 rehash 时为 1
 ```
 
@@ -87,7 +87,7 @@ hash = dict->type->hashFunction(k);
 ### rehash 过程
 
 当哈希表保存的数据太多或太少时，需要对哈希表进行相应的扩容或者收缩。
-如果进行扩容操作，那么 `ht[1]` 的大小为第一个不小于 `ht[0].used * 2` 的 2^n (n 为正整数)， 如: `used = 5`, `ht[0].used * 2 = 10 < 2^4 = 16`, 所以 `ht[1]` 的大小为：16 · 
+如果进行扩容操作，那么 `ht[1]` 的大小为第一个不小于 `ht[0].used * 2` 的 2^n (n 为正整数)， 如: `used = 5`, `ht[0].used * 2 = 10 < 2^4 = 16`, 所以 `ht[1]` 的大小为：16 ·
 然后就可以将 `ht[0]` 的数据哈希到 `ht[1]` 中， 当 `ht[0]` 中的数据全部哈希到 `ht[1]` 后， 释放 `ht[0]`,  将 `ht[1]` 变 `ht[0]`
 
 #### 扩展的触发条件

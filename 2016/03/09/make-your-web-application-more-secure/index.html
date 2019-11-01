@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="cookie,Yii2,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="让你的web应用更安全 X-Frame-Options Cookie of secure and httpOnly  设置X-Frame-Options https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options  X-Frame-Options 主要是为了防止点击劫持(clickjacking)点击劫持(clickjacki">
+<meta name="keywords" content="cookie,Yii2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="让你的web应用更安全">
+<meta property="og:url" content="http://github.com/wangming1993/2016/03/09/make-your-web-application-more-secure/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="让你的web应用更安全 X-Frame-Options Cookie of secure and httpOnly  设置X-Frame-Options https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options  X-Frame-Options 主要是为了防止点击劫持(clickjacking)点击劫持(clickjacki">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="让你的web应用更安全">
+<meta name="twitter:description" content="让你的web应用更安全 X-Frame-Options Cookie of secure and httpOnly  设置X-Frame-Options https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options  X-Frame-Options 主要是为了防止点击劫持(clickjacking)点击劫持(clickjacki">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2016/03/09/make-your-web-application-more-secure/">
+
+
+
+
+
+  <title>让你的web应用更安全 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2016/03/09/make-your-web-application-more-secure/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">让你的web应用更安全</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-09T20:39:22+00:00">
+                2016-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="让你的web应用更安全"><a href="#让你的web应用更安全" class="headerlink" title="让你的web应用更安全"></a>让你的web应用更安全</h1><ul>
+<li><strong>X-Frame-Options</strong></li>
+<li><strong>Cookie of secure and httpOnly</strong></li>
+</ul>
+<h2 id="设置X-Frame-Options"><a href="#设置X-Frame-Options" class="headerlink" title="设置X-Frame-Options"></a>设置X-Frame-Options</h2><blockquote>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options" target="_blank" rel="noopener">https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options</a></p>
+</blockquote>
+<p><strong>X-Frame-Options</strong> 主要是为了防止<code>点击劫持</code><a href="https://en.wikipedia.org/wiki/Clickjacking" target="_blank" rel="noopener">(clickjacking)</a><br><strong>点击劫持(clickjacking)</strong>是一种在网页中将恶意代码等隐藏在看似无害的内容（如按钮）之下，并诱使用户点击的手段。<br><strong>X-Frame-Options</strong> HTTP 头部字段用来指示传输的资源是否可以被包含在 <code>&lt;frame&gt;</code> 或 <code>&lt;iframe&gt;</code> 中，服务端可以声明这个策略来确保自己的网页内容不会被嵌入到其他的页面中．<br><strong>X-Frame-Options</strong>　具有３个具体的值：</p>
+<ul>
+<li><strong>DENY</strong><br>表明网页内容不可以被嵌入到任何<code>frame</code>中</li>
+<li><strong>SAMEORIGIN</strong><br>同源策略，声明网页内容可以被同一域下面的<code>frame</code>嵌入，但不能被不在同一域下面的<code>frame</code>嵌入．<br><strong>同源</strong>： 协议，域名和端口全部相同，即使是ip与域名对应，也认为是不同域下，<br>下面说明了具体的情况，与：<code>http://www.example.com/dir/page.html</code>对比：</li>
+</ul>
+<a id="more"></a>
+
+<table>
+<thead>
+<tr>
+<th align="center">Compared URL</th>
+<th align="center">Outcome</th>
+<th align="center">Reason</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>http://www.example.com/dir/page2.html</code></td>
+<td align="center">同源</td>
+<td align="center">协议主机端口相同</td>
+</tr>
+<tr>
+<td align="center"><code>http://www.example.com/dir2/other.html</code></td>
+<td align="center">同源</td>
+<td align="center">协议主机端口相同</td>
+</tr>
+<tr>
+<td align="center"><code>http://username:password@www.example.com/dir2/other.html</code></td>
+<td align="center">同源</td>
+<td align="center">协议主机端口相同</td>
+</tr>
+<tr>
+<td align="center"><code>http://www.example.com:81/dir/other.html</code></td>
+<td align="center">不同源</td>
+<td align="center">端口不同</td>
+</tr>
+<tr>
+<td align="center"><code>https://www.example.com/dir/other.html</code></td>
+<td align="center">不同源</td>
+<td align="center">协议不同</td>
+</tr>
+<tr>
+<td align="center"><code>http://en.example.com/dir/other.html</code></td>
+<td align="center">不同源</td>
+<td align="center">主机名不同</td>
+</tr>
+<tr>
+<td align="center"><code>http://example.com/dir/other.html</code></td>
+<td align="center">不同源</td>
+<td align="center">主机不同，必须完全匹配</td>
+</tr>
+<tr>
+<td align="center"><code>http://v2.www.example.com/dir/other.html</code></td>
+<td align="center">不同源</td>
+<td align="center">主机不同，必须完全匹配</td>
+</tr>
+<tr>
+<td align="center"><code>http://www.example.com:80/dir/other.html</code></td>
+<td align="center">Depends</td>
+<td align="center">Port explicit. Depends on implementation in browser</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>ALLOW-FROM</strong><br>指定具体的来源</li>
+</ul>
+<h2 id="服务器配置"><a href="#服务器配置" class="headerlink" title="服务器配置"></a>服务器配置</h2><h3 id="Apache"><a href="#Apache" class="headerlink" title="Apache"></a>Apache</h3><p>添加站点配置：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Header always <span class="keyword">append</span> X-Frame-<span class="keyword">Options</span> SAMEORIGIN</span><br></pre></td></tr></table></figure>
+
+<h3 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h3><p>添加 <code>http</code> , <code>server</code> 或者　<code>location</code> 配置</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add_header X-<span class="keyword">Frame</span>-<span class="keyword">Options</span> SAMEORIGIN;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IIS"><a href="#IIS" class="headerlink" title="IIS"></a>IIS</h3><p>添加到站点的 Web.config</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">system.webServer</span>&gt;</span></span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">httpProtocol</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">customHeaders</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">"X-Frame-Options"</span> <span class="attr">value</span>=<span class="string">"SAMEORIGIN"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">customHeaders</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">httpProtocol</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  ...</span><br><span class="line"><span class="tag">&lt;/<span class="name">system.webServer</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="HAProxy"><a href="#HAProxy" class="headerlink" title="HAProxy"></a>HAProxy</h3><p>添加到 <code>frontend</code>, <code>listen</code>, 或者 <code>backend</code> 配置中:</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rspadd X-<span class="keyword">Frame</span>-<span class="keyword">Options</span>:\ SAMEORIGIN</span><br></pre></td></tr></table></figure>
+
+<h2 id="更安全的Cookie"><a href="#更安全的Cookie" class="headerlink" title="更安全的Cookie"></a>更安全的Cookie</h2><p><code>Cookie</code> 是浏览器储存在客户端的小的文本文件，用于客户端与服务器之间互传．<br>Web服务器通过指定 <code>http header</code> 的 <code>Set-Cookie</code>, 其结构如下：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-Cookie: name=value[<span class="string">; expires=date</span>][<span class="symbol">; domain=domain</span>][<span class="string">; path=path</span>][<span class="symbol">; secure</span>][<span class="string">; httpOnly</span>]</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，<code>Cookie</code> 主要包含一下几个字段：</p>
+<ul>
+<li><strong>name</strong></li>
+<li><strong>value</strong></li>
+<li><strong>expire</strong></li>
+<li><strong>domain</strong></li>
+<li><strong>path</strong></li>
+<li><strong>secure</strong></li>
+<li><strong>httpOnly</strong></li>
+</ul>
+<p>这里主要讲<code>secure</code> 和 <code>httpOnly</code></p>
+<h3 id="httpOnly标识"><a href="#httpOnly标识" class="headerlink" title="httpOnly标识"></a>httpOnly标识</h3><p>用来告诉浏览器不能通过<code>JavaScript</code>的 <code>document.cookie</code> 来访问 cookie, 目的是避免 <strong>跨站脚本攻击 (XSS)</strong></p>
+<h3 id="secure标识"><a href="#secure标识" class="headerlink" title="secure标识"></a>secure标识</h3><p>强制应用通过<code>Https</code>来传输 Cookie</p>
+<h2 id="PHP-Yii2中设置Cookie的-httpOnly-和-secure"><a href="#PHP-Yii2中设置Cookie的-httpOnly-和-secure" class="headerlink" title="PHP Yii2中设置Cookie的 httpOnly 和 secure"></a>PHP Yii2中设置Cookie的 httpOnly 和 secure</h2><h3 id="设置-csrf"><a href="#设置-csrf" class="headerlink" title="设置 _csrf"></a>设置 _csrf</h3><p>Yii2中的 Cookie  <code>yii\web\Cookie</code>默认是 httpOnly的, </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cookie</span> <span class="keyword">extends</span> \<span class="title">yii</span>\<span class="title">base</span>\<span class="title">Object</span></span></span><br><span class="line"><span class="class"></span>&#123; </span><br><span class="line">    <span class="keyword">public</span> $name;</span><br><span class="line">    <span class="keyword">public</span> $value = <span class="string">''</span>;</span><br><span class="line">    <span class="keyword">public</span> $domain = <span class="string">''</span>;</span><br><span class="line">    <span class="keyword">public</span> $expire = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> $path = <span class="string">'/'</span>;</span><br><span class="line">    <span class="keyword">public</span> $secure = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">public</span> $httpOnly = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>&lt;?= Html::csrfMetaTags() ?&gt;</code> 就会生成一个 <code>name=_csrf</code> 的 Cookie,  默认是 httpOnly, 通过注入<code>request</code>来改变:</p>
+<p>在 <code>config/main.php</code> 中</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="string">'components'</span> =&gt; [</span><br><span class="line">    <span class="string">'request'</span> =&gt; [</span><br><span class="line">        <span class="string">'csrfCookie'</span> =&gt; [</span><br><span class="line">            <span class="string">'httpOnly'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">            <span class="string">'secure'</span>   =&gt; SECURE_COOKIE,</span><br><span class="line">        ],</span><br><span class="line">    ],</span><br><span class="line">...</span><br><span class="line">]</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>注入 <code>csrfCookie</code> 的 httpOnly 和 secure 属性值</p>
+<h3 id="生成secure的-Cookie"><a href="#生成secure的-Cookie" class="headerlink" title="生成secure的 Cookie"></a>生成secure的 Cookie</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$cookies = Yii::$app-&gt;response-&gt;cookies;</span><br><span class="line">$cookies-&gt;add(<span class="keyword">new</span> Cookie([</span><br><span class="line">    <span class="string">'name'</span> =&gt; <span class="string">'accesstoken'</span>, </span><br><span class="line">    <span class="string">'value'</span> =&gt; $accessToken, </span><br><span class="line">    <span class="string">'expire'</span> =&gt; time() + Token::EXPIRE_TIME, </span><br><span class="line">    <span class="string">'secure'</span> =&gt; SECURE_COOKIE</span><br><span class="line">    ])</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>注意更新 Cookie 的时候也需要更新 secure 属性</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$cookies = Yii::$app-&gt;request-&gt;cookies;</span><br><span class="line"><span class="keyword">if</span> (($cookie = $cookies-&gt;get(<span class="string">'accesstoken'</span>)) !== <span class="keyword">null</span>) &#123;</span><br><span class="line">    $cookie-&gt;secure = SECURE_COOKIE;</span><br><span class="line">    <span class="comment">// 这里很重要, 不然就会丢失</span></span><br><span class="line">    $cookie-&gt;expire = time() + Token::EXPIRE_TIME;</span><br><span class="line">    Yii::$app-&gt;response-&gt;cookies-&gt;add($cookie);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cookie/" rel="tag"># cookie</a>
+          
+            <a href="/tags/Yii2/" rel="tag"># Yii2</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/06/write-sublime-text-3-plugin/" rel="next" title="Sublime Text 3自定义插件">
+                <i class="fa fa-chevron-left"></i> Sublime Text 3自定义插件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/23/php/my-first-php-extension/" rel="prev" title="我的第一个PHP扩展">
+                我的第一个PHP扩展 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#让你的web应用更安全"><span class="nav-number">1.</span> <span class="nav-text">让你的web应用更安全</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设置X-Frame-Options"><span class="nav-number">1.1.</span> <span class="nav-text">设置X-Frame-Options</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器配置"><span class="nav-number">1.2.</span> <span class="nav-text">服务器配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Apache"><span class="nav-number">1.2.1.</span> <span class="nav-text">Apache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx"><span class="nav-number">1.2.2.</span> <span class="nav-text">Nginx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IIS"><span class="nav-number">1.2.3.</span> <span class="nav-text">IIS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HAProxy"><span class="nav-number">1.2.4.</span> <span class="nav-text">HAProxy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更安全的Cookie"><span class="nav-number">1.3.</span> <span class="nav-text">更安全的Cookie</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#httpOnly标识"><span class="nav-number">1.3.1.</span> <span class="nav-text">httpOnly标识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#secure标识"><span class="nav-number">1.3.2.</span> <span class="nav-text">secure标识</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP-Yii2中设置Cookie的-httpOnly-和-secure"><span class="nav-number">1.4.</span> <span class="nav-text">PHP Yii2中设置Cookie的 httpOnly 和 secure</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置-csrf"><span class="nav-number">1.4.1.</span> <span class="nav-text">设置 _csrf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成secure的-Cookie"><span class="nav-number">1.4.2.</span> <span class="nav-text">生成secure的 Cookie</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

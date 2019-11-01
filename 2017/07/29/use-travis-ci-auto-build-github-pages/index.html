@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="travis-ci,github pages,hexo,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="之前使用 hexo 搭建自己的Github pages, 配置了很久的 next 主题, 写了一段时间的文章，感觉棒棒的。 但是后面换了电脑，忘记备份数据，所有的markdown文件也没有push到Github上，因为这些原因我就没有写过了。最近打算重新拾起写文章记录的习惯，因为只有不断的总结才能更好的理解学习。考虑到之前遇到的问题，加上有过gitlab ci的使用经验，决定使用 travis-">
+<meta name="keywords" content="travis-ci,github pages,hexo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用travis-ci自动构建你的Github主页">
+<meta property="og:url" content="http://github.com/wangming1993/2017/07/29/use-travis-ci-auto-build-github-pages/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="之前使用 hexo 搭建自己的Github pages, 配置了很久的 next 主题, 写了一段时间的文章，感觉棒棒的。 但是后面换了电脑，忘记备份数据，所有的markdown文件也没有push到Github上，因为这些原因我就没有写过了。最近打算重新拾起写文章记录的习惯，因为只有不断的总结才能更好的理解学习。考虑到之前遇到的问题，加上有过gitlab ci的使用经验，决定使用 travis-">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://cdn.jokingus.com/travis-ci-setting.png">
+<meta property="og:image" content="http://cdn.jokingus.com/wangming1993-github-com.png">
+<meta property="og:image" content="http://cdn.jokingus.com/more-options.png">
+<meta property="og:image" content="http://cdn.jokingus.com/setting.png">
+<meta property="og:image" content="http://cdn.jokingus.com/env-setting.png">
+<meta property="og:image" content="http://cdn.jokingus.com/select-scopes.png">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用travis-ci自动构建你的Github主页">
+<meta name="twitter:description" content="之前使用 hexo 搭建自己的Github pages, 配置了很久的 next 主题, 写了一段时间的文章，感觉棒棒的。 但是后面换了电脑，忘记备份数据，所有的markdown文件也没有push到Github上，因为这些原因我就没有写过了。最近打算重新拾起写文章记录的习惯，因为只有不断的总结才能更好的理解学习。考虑到之前遇到的问题，加上有过gitlab ci的使用经验，决定使用 travis-">
+<meta name="twitter:image" content="http://cdn.jokingus.com/travis-ci-setting.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2017/07/29/use-travis-ci-auto-build-github-pages/">
+
+
+
+
+
+  <title>使用travis-ci自动构建你的Github主页 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2017/07/29/use-travis-ci-auto-build-github-pages/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用travis-ci自动构建你的Github主页</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-29T23:08:41+00:00">
+                2017-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>之前使用 <a href="https://hexo.io/" target="_blank" rel="noopener"><strong>hexo</strong></a> 搭建自己的Github pages, 配置了很久的 <a href="http://theme-next.iissnan.com/" target="_blank" rel="noopener"><strong>next</strong></a> 主题, 写了一段时间的文章，感觉棒棒的。 但是后面换了电脑，忘记备份数据，所有的markdown文件也没有push到Github上，因为这些原因我就没有写过了。<br>最近打算重新拾起写文章记录的习惯，因为只有不断的总结才能更好的理解学习。考虑到之前遇到的问题，加上有过gitlab ci的使用经验，决定使用 <a href="https://travis-ci.org" target="_blank" rel="noopener">travis-ci</a> 自动构建github主页。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="travis-ci使用"><a href="#travis-ci使用" class="headerlink" title="travis-ci使用"></a>travis-ci使用</h2><h3 id="travis-ci设置"><a href="#travis-ci设置" class="headerlink" title="travis-ci设置"></a>travis-ci设置</h3><p>打开<a href="https://travis-ci.org/" target="_blank" rel="noopener">travis-ci</a>主页，选择右上角的 <code>Sign in with Github</code>, 使用你的 Github账号登录，进入你的accounts页面：<br><img src="http://cdn.jokingus.com/travis-ci-setting.png" alt="accounts"></p>
+<p>选择你要使用travis-ci构建的Github repository, 这里我开启的是： <code>wangming1993.github.com</code><br><img src="http://cdn.jokingus.com/wangming1993-github-com.png" alt="wangming1993.github.com"></p>
+<p>点击右下角的<code>More options</code> <img src="http://cdn.jokingus.com/more-options.png" alt="More options">， 进入repository的setting页面： <img src="http://cdn.jokingus.com/setting.png" alt="setting">, 做一些设置，如：只有存在<code>.travis.yml</code>文件时才会触发自动build。</p>
+<h3 id="travis-ci配置文件"><a href="#travis-ci配置文件" class="headerlink" title="travis-ci配置文件"></a>travis-ci配置文件</h3><p>travis-ci自动build依赖于<code>.travis.yml</code>文件，文件会配置你的语言环境，版本，branch信息，环境变量，以及<code>before_install</code>, <code>install</code>, <code>script</code>,<code>after_success</code> 之类的hook.</p>
+<p>这里我先列出我的<code>travis.yml</code>文件内容，然后坐进一步介绍：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">language:</span> <span class="string">node_js</span></span><br><span class="line"><span class="attr">node_js:</span> <span class="string">stable</span></span><br><span class="line"><span class="attr">branches:</span></span><br><span class="line"><span class="attr">  only:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">develop</span></span><br><span class="line"><span class="attr">before_install:</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="bullet">-g</span> <span class="string">hexo</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="bullet">-g</span> <span class="string">hexo-cli</span></span><br><span class="line"><span class="attr">install:</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span></span><br><span class="line"><span class="attr">script:</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">hexo</span> <span class="string">clean</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">hexo</span> <span class="string">generate</span></span><br><span class="line"><span class="attr">after_success:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">cd</span> <span class="string">./public</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">git</span> <span class="string">init</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">git</span> <span class="string">config</span> <span class="bullet">--global</span> <span class="string">user.name</span> <span class="string">'wangming1993'</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">git</span> <span class="string">config</span> <span class="bullet">--global</span> <span class="string">user.email</span> <span class="string">'wangming19932008@163.com'</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">git</span> <span class="string">add</span> <span class="string">.</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">git</span> <span class="string">commit</span> <span class="bullet">-m</span> <span class="string">"generate static resources, triggerd by travis ci"</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">git</span> <span class="string">push</span> <span class="bullet">--force</span> <span class="string">"https://wangming1993:$&#123;REPO_TOKEN&#125;@$&#123;GH_REF&#125;"</span> <span class="attr">master:master</span></span><br><span class="line"><span class="attr">env:</span></span><br><span class="line"><span class="attr">  global:</span></span><br><span class="line"><span class="attr">    - GH_REF:</span> <span class="string">github.com/wangming1993/wangming1993.github.com.git</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>language: node_js</code><ul>
+<li>因为使用的hexo是通过npm安装的，这就要求nodejs环境</li>
+</ul>
+</li>
+<li><code>node_js: stable</code><ul>
+<li>这个也很重要，不然低版本会报错</li>
+</ul>
+</li>
+<li><code>branches</code><ul>
+<li>only develop, 因为master分支我push的是作为Github pages需要的静态文件的。</li>
+</ul>
+</li>
+<li><code>before_install</code>,<code>install</code><ul>
+<li>安装hexo以及运行hexo需要的一些node modules</li>
+</ul>
+</li>
+<li><code>script</code><ul>
+<li>这里指定构建时的shell命令， <code>hexo clean</code>清除缓存，<code>hexo generate</code>将markdown文件转换为html文件，并使用配置的主题。</li>
+</ul>
+</li>
+<li><code>after_success</code><ul>
+<li>可以用于指定构建步骤成功后的执行动作，如将生成的静态资源push到Github repository</li>
+</ul>
+</li>
+<li><code>env</code><ul>
+<li>用于定于一些环境变量，这些会通过<code>export</code>的方式供当前shell引用</li>
+</ul>
+</li>
+</ul>
+<p>这里需要着重介绍一下push文件到Github的过程，我使用:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --force "https://wangming1993:$&#123;REPO_TOKEN&#125;@$&#123;GH_REF&#125;"</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>wangming1993</code><ul>
+<li>这是我的Github ID</li>
+</ul>
+</li>
+<li><code>${REPO_TOKEN}</code><ul>
+<li>Github的Personal access tokens， 因为这个涉及到安全性，不能push到Github,所以这个环境变量我是在travis-ci里面配置的</li>
+</ul>
+</li>
+<li><code>{GH_REF}</code><ul>
+<li>指定你push的Github repository, 配置的<code>.travis.yml</code>文件的env中</li>
+</ul>
+</li>
+</ul>
+<p><strong>那么如何在travis-ci中配置环境变量呢？</strong></p>
+<p>首先明确的是这个环境变量的作用域是在你的具体repository中的，如我的repository是:<code>wangming1993.github.com</code>, 那么就需要在这个repository的<strong>setting</strong>里面进行配置：</p>
+<p><img src="http://cdn.jokingus.com/env-setting.png" alt="env setting"></p>
+<p>而关于Personal access tokens,你需要在你的Github中生成， 访问： <a href="https://github.com/settings/tokens/new">https://github.com/settings/tokens/new</a> ， 选择权限 <img src="http://cdn.jokingus.com/select-scopes.png" alt="scopes"> （PS: 我是勾选的全部权限). 然后将会生成一个token.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/travis-ci/" rel="tag"># travis-ci</a>
+          
+            <a href="/tags/github-pages/" rel="tag"># github pages</a>
+          
+            <a href="/tags/hexo/" rel="tag"># hexo</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/28/macos-gem-install/" rel="next" title="Mac OS gem install 问题">
+                <i class="fa fa-chevron-left"></i> Mac OS gem install 问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/16/redis/sds/" rel="prev" title="简单动态字符串 (SDS)【Redis 设计与实现】">
+                简单动态字符串 (SDS)【Redis 设计与实现】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#travis-ci使用"><span class="nav-number">1.</span> <span class="nav-text">travis-ci使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#travis-ci设置"><span class="nav-number">1.1.</span> <span class="nav-text">travis-ci设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#travis-ci配置文件"><span class="nav-number">1.2.</span> <span class="nav-text">travis-ci配置文件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

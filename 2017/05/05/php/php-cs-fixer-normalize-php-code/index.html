@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="coding style,php-cs-fixer,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="对于多人协作的项目，如果没有强制性的代码风格约束，很容易出现不一致问题。我们需要有规范来告诉别人应该怎么去做，但是我们无法保证每个人都是在按照规范来做。标准规范都应该落实到强制性约束上，这可以让开发者无需考虑规范，但又始终在规范之内. 这里我不得不赞一下golang语言，存在相应的工具，你无需纠结于缩进使用空格还是TAB,   gofmt来解决, import的顺序是如何，也有goimports的">
+<meta name="keywords" content="coding style,php-cs-fixer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于代码规范">
+<meta property="og:url" content="http://github.com/wangming1993/2017/05/05/php/php-cs-fixer-normalize-php-code/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="对于多人协作的项目，如果没有强制性的代码风格约束，很容易出现不一致问题。我们需要有规范来告诉别人应该怎么去做，但是我们无法保证每个人都是在按照规范来做。标准规范都应该落实到强制性约束上，这可以让开发者无需考虑规范，但又始终在规范之内. 这里我不得不赞一下golang语言，存在相应的工具，你无需纠结于缩进使用空格还是TAB,   gofmt来解决, import的顺序是如何，也有goimports的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于代码规范">
+<meta name="twitter:description" content="对于多人协作的项目，如果没有强制性的代码风格约束，很容易出现不一致问题。我们需要有规范来告诉别人应该怎么去做，但是我们无法保证每个人都是在按照规范来做。标准规范都应该落实到强制性约束上，这可以让开发者无需考虑规范，但又始终在规范之内. 这里我不得不赞一下golang语言，存在相应的工具，你无需纠结于缩进使用空格还是TAB,   gofmt来解决, import的顺序是如何，也有goimports的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2017/05/05/php/php-cs-fixer-normalize-php-code/">
+
+
+
+
+
+  <title>关于代码规范 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2017/05/05/php/php-cs-fixer-normalize-php-code/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于代码规范</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T21:16:52+00:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>对于多人协作的项目，如果没有强制性的代码风格约束，很容易出现不一致问题。<br>我们需要有规范来告诉别人应该怎么去做，但是我们无法保证每个人都是在按照规范来做。<br><em>标准规范都应该落实到强制性约束上，这可以让开发者无需考虑规范，但又始终在规范之内</em>.</p>
+<p>这里我不得不赞一下<code>golang</code>语言，存在相应的工具，你无需纠结于缩进使用<strong>空格</strong>还是<strong>TAB</strong>, 
+ <code>gofmt</code>来解决, <code>import</code>的顺序是如何，也有<code>goimports</code>的工具.</p>
+<p>之前一直也想着整理PHP代码规范，然后落实到项目中去，但没有具体落实下去。留下来<br>的技术债，终究是要还的。最近项目集成了<a href="https://docs.gitlab.com/ce/ci/" target="_blank" rel="noopener">gitlab-ci</a>, 
+可以在提交代码的时候在代码检查，正好符合强制性约束的要求。</p>
+<p>一开始使用的是<a href="https://github.com/squizlabs/PHP_CodeSniffer">PHP_Code_Sniffer</a>来做代码检查，但是因为一些历史原因，不能很好的适配，如果忽略warning级别的提示，检查的力度又太粗了。于是换了<a href="https://github.com/FriendsOfPHP/PHP-CS-Fixer">php-cs-fixer</a>, 对里面的一些配置项做了筛选，确定了最终的配置。</p>
+<a id="more"></a> 
+
+<p>配置文件如下:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> PhpCsFixer\Config::create()</span><br><span class="line">    -&gt;setRiskyAllowed(<span class="keyword">true</span>)</span><br><span class="line">    -&gt;setRules([</span><br><span class="line">        <span class="string">'@PSR2'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'array_syntax'</span> =&gt; [</span><br><span class="line">            <span class="string">'syntax'</span> =&gt; <span class="string">'short'</span>,</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">'binary_operator_spaces'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'blank_line_before_return'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'concat_space'</span> =&gt; [</span><br><span class="line">            <span class="string">'spacing'</span> =&gt; <span class="string">'one'</span>,</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">'function_typehint_space'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'hash_to_slash_comment'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'linebreak_after_opening_tag'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'lowercase_cast'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'method_separation'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'native_function_casing'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'new_with_braces'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_alias_functions'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_blank_lines_after_class_opening'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_blank_lines_after_phpdoc'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_blank_lines_before_namespace'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_empty_comment'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_empty_phpdoc'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_empty_statement'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_extra_consecutive_blank_lines'</span> =&gt; [</span><br><span class="line">            <span class="string">'continue'</span>,</span><br><span class="line">            <span class="string">'curly_brace_block'</span>,</span><br><span class="line">            <span class="string">'extra'</span>,</span><br><span class="line">            <span class="string">'parenthesis_brace_block'</span>,</span><br><span class="line">            <span class="string">'square_brace_block'</span>,</span><br><span class="line">            <span class="string">'throw'</span>,</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">'no_leading_import_slash'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_leading_namespace_whitespace'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_multiline_whitespace_around_double_arrow'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_multiline_whitespace_before_semicolons'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_short_bool_cast'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_singleline_whitespace_before_semicolons'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_trailing_comma_in_list_call'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_trailing_comma_in_singleline_array'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_unneeded_control_parentheses'</span> =&gt; [</span><br><span class="line">            <span class="string">'break'</span>,</span><br><span class="line">            <span class="string">'clone'</span>,</span><br><span class="line">            <span class="string">'continue'</span>,</span><br><span class="line">            <span class="string">'echo_print'</span>,</span><br><span class="line">            <span class="string">'return'</span>,</span><br><span class="line">            <span class="string">'switch_case'</span>,</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">'no_unreachable_default_argument_value'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_unused_imports'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_useless_else'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_useless_return'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_whitespace_before_comma_in_array'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'no_whitespace_in_blank_line'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'normalize_index_brace'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'ordered_imports'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'phpdoc_indent'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'phpdoc_scalar'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'phpdoc_types'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'phpdoc_single_line_var_spacing'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'phpdoc_annotation_without_dot'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="comment">// 'phpdoc_add_missing_param_annotation' =&gt; true,</span></span><br><span class="line">        <span class="comment">// 'phpdoc_no_package' =&gt; true,</span></span><br><span class="line">        <span class="comment">// 'phpdoc_order' =&gt; true,</span></span><br><span class="line">        <span class="string">'self_accessor'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'short_scalar_cast'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'single_quote'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'standardize_not_equals'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'ternary_operator_spaces'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'trailing_comma_in_multiline_array'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">        <span class="string">'whitespace_after_comma_in_array'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">    ]);</span><br></pre></td></tr></table></figure>
+
+<p>主要效果: </p>
+<ul>
+<li>去掉无用<code>use</code></li>
+<li>使用<code>use</code>时去掉开始的<code>\</code>, 如<code>use \ApiTester;</code> =&gt; <code>use ApiTester;</code></li>
+<li>一个<code>class</code>文件中的<code>use</code>语句按照字母序排序 </li>
+<li><code>else if</code>变成单个<code>elseif</code></li>
+<li>去掉无用的<code>else</code></li>
+<li>不使用<code>array()</code>, 使用<code>[]</code></li>
+<li><code>=&gt;</code>, <code>+</code>, <code>-</code>, <code>.</code>, <code>?</code>操作符两侧各保留一个空格</li>
+<li><code>return</code>语句前保留一个空行</li>
+<li>不使用函数的别名，如使用 <code>implode()</code>, 而不是<code>join()</code></li>
+<li>函数之间以单个空行分隔</li>
+<li>纯字符串使用单引号，不使用双引号<ul>
+<li>使用<code>new Object();</code> 而不是 <code>new Object;</code></li>
+</ul>
+</li>
+<li>注释不以<code>.</code>结尾</li>
+<li>注释缩进</li>
+</ul>
+<p>在<strong>CI</strong>中检测上一次的commit:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff --name-only --diff-filter=ACMRT --exit-code HEAD~1</span><br></pre></td></tr></table></figure>
+
+<p>通过先fix: </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php ci/php-cs-fixer.phar fix --config=.php_cs $file</span><br></pre></td></tr></table></figure>
+
+<p>然后比较改动:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff --exit-code --color=always  $file</span><br></pre></td></tr></table></figure>
+
+<p>来确定文件是否符合规范并输出不同</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/coding-style/" rel="tag"># coding style</a>
+          
+            <a href="/tags/php-cs-fixer/" rel="tag"># php-cs-fixer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/02/yii2-set-controller-layout-and-view/" rel="next" title="Yii2 controller中如何设置layout和view的路径">
+                <i class="fa fa-chevron-left"></i> Yii2 controller中如何设置layout和view的路径
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/16/config-mongodb-replicaSet-with-docker/" rel="prev" title="在docker容器内使用容器外的mongodb的复制集">
+                在docker容器内使用容器外的mongodb的复制集 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

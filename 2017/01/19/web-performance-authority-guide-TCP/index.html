@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="TCP,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="延迟 分组从信息源发送到目的地所需要的时间  带宽 逻辑或物理通信路径上的最大吞吐量  TCP连接 三次握手: 为什么说在发送数据之前需要经历一次完整的往返？ 建立TCP连接需要3次SYN分组确认，而在发送第三次SYN确认分组后，发送端可以立即发送数据。此时已经经历了一次完整的往返。但是接收端必须在第三次SYN到达确认后才可以接收数据。">
+<meta name="keywords" content="TCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【web性能权威指南】TCP">
+<meta property="og:url" content="http://github.com/wangming1993/2017/01/19/web-performance-authority-guide-TCP/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="延迟 分组从信息源发送到目的地所需要的时间  带宽 逻辑或物理通信路径上的最大吞吐量  TCP连接 三次握手: 为什么说在发送数据之前需要经历一次完整的往返？ 建立TCP连接需要3次SYN分组确认，而在发送第三次SYN确认分组后，发送端可以立即发送数据。此时已经经历了一次完整的往返。但是接收端必须在第三次SYN到达确认后才可以接收数据。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【web性能权威指南】TCP">
+<meta name="twitter:description" content="延迟 分组从信息源发送到目的地所需要的时间  带宽 逻辑或物理通信路径上的最大吞吐量  TCP连接 三次握手: 为什么说在发送数据之前需要经历一次完整的往返？ 建立TCP连接需要3次SYN分组确认，而在发送第三次SYN确认分组后，发送端可以立即发送数据。此时已经经历了一次完整的往返。但是接收端必须在第三次SYN到达确认后才可以接收数据。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2017/01/19/web-performance-authority-guide-TCP/">
+
+
+
+
+
+  <title>【web性能权威指南】TCP | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2017/01/19/web-performance-authority-guide-TCP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【web性能权威指南】TCP</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-19T21:11:10+00:00">
+                2017-01-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="延迟"><a href="#延迟" class="headerlink" title="延迟"></a><strong>延迟</strong></h2><ul>
+<li>分组从信息源发送到目的地所需要的时间</li>
+</ul>
+<h2 id="带宽"><a href="#带宽" class="headerlink" title="带宽"></a><strong>带宽</strong></h2><ul>
+<li>逻辑或物理通信路径上的最大吞吐量</li>
+</ul>
+<h2 id="TCP连接-三次握手"><a href="#TCP连接-三次握手" class="headerlink" title="TCP连接 三次握手:"></a>TCP连接 <strong>三次握手</strong>:</h2><ul>
+<li>为什么说在发送数据之前需要经历一次完整的往返？</li>
+<li>建立TCP连接需要3次SYN分组确认，而在发送第三次SYN确认分组后，发送端可以立即发送数据。此时已经经历了一次完整的往返。但是接收端必须在第三次SYN到达确认后才可以接收数据。</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="流量控制"><a href="#流量控制" class="headerlink" title="流量控制"></a><strong>流量控制</strong></h2><ul>
+<li>每个ACK分组都会携带rwnd值以便客户端和服务器动态调整发送数据大小</li>
+</ul>
+<h2 id="rwnd-接收窗口"><a href="#rwnd-接收窗口" class="headerlink" title="rwnd 接收窗口"></a><strong>rwnd</strong> 接收窗口</h2><h2 id="cwnd-拥塞窗口"><a href="#cwnd-拥塞窗口" class="headerlink" title="cwnd 拥塞窗口"></a><strong>cwnd</strong> 拥塞窗口</h2><h2 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a><strong>拥塞控制</strong></h2><ul>
+<li>服务器发送数据的值为<code>min(rwnd, cwnd)</code>, 每个ACK确认， <code>cwnd + 1</code>, 直到达到rwnd的值</li>
+</ul>
+<h2 id="慢启动重启-Slow-Start-Restart-SSR"><a href="#慢启动重启-Slow-Start-Restart-SSR" class="headerlink" title="慢启动重启   Slow-Start Restart     SSR"></a><strong>慢启动重启</strong>   Slow-Start Restart     SSR</h2><ul>
+<li>连接空闲后重置连接的拥塞窗口</li>
+</ul>
+<h2 id="拥塞预防"><a href="#拥塞预防" class="headerlink" title="拥塞预防"></a><strong>拥塞预防</strong></h2><ul>
+<li>把丢包作为网路拥塞的标志，采取删包措施</li>
+<li>删包算法<ul>
+<li><strong>AIMD</strong>  倍减加增   发生丢包时拥塞窗口减半</li>
+<li>PRR  比例降速</li>
+</ul>
+</li>
+</ul>
+<h2 id="BDP-带宽延迟积"><a href="#BDP-带宽延迟积" class="headerlink" title="BDP 带宽延迟积"></a><strong>BDP</strong> 带宽延迟积</h2><pre><code>+ 任意时刻处于在途未确认状态的最大数据量</code></pre><h2 id="TCP队首阻塞-HOL-Head-of-Line"><a href="#TCP队首阻塞-HOL-Head-of-Line" class="headerlink" title="TCP队首阻塞  HOL (Head of Line)"></a><strong>TCP队首阻塞</strong>  HOL (Head of Line)</h2><ul>
+<li>每个TCP分组都带有唯一序号，分组必须按序被接收。如果中途有分组未到达，后续分组进入TCP缓冲区，等待丢失分组被重发并确认。</li>
+</ul>
+<h2 id="抖动"><a href="#抖动" class="headerlink" title="抖动"></a><strong>抖动</strong></h2><ul>
+<li>分组到达时间存在无法预知的延迟变化（因为HOL），这个时间变化称为抖动</li>
+</ul>
+<h2 id="针对TCP的调优"><a href="#针对TCP的调优" class="headerlink" title="针对TCP的调优"></a><strong>针对TCP的调优</strong></h2><ol>
+<li>增大TCP的初始拥塞窗口</li>
+<li>禁用慢启动重启</li>
+<li>窗口缩放<ul>
+<li>支持大于64k的rwnd， 在TCP握手阶段rnwd标志位左移16位，使支持最大1G的发送数据</li>
+</ul>
+</li>
+<li>TCP快速打开（需要客户端于服务器的共同支持）</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TCP/" rel="tag"># TCP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/05/go/go-code-review-comments/" rel="next" title="go code review comments 【译文】">
+                <i class="fa fa-chevron-left"></i> go code review comments 【译文】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/14/endless-graceful-restart/" rel="prev" title="endless是如何实现graceful restart">
+                endless是如何实现graceful restart <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#延迟"><span class="nav-number">1.</span> <span class="nav-text">延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#带宽"><span class="nav-number">2.</span> <span class="nav-text">带宽</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP连接-三次握手"><span class="nav-number">3.</span> <span class="nav-text">TCP连接 三次握手:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流量控制"><span class="nav-number">4.</span> <span class="nav-text">流量控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rwnd-接收窗口"><span class="nav-number">5.</span> <span class="nav-text">rwnd 接收窗口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cwnd-拥塞窗口"><span class="nav-number">6.</span> <span class="nav-text">cwnd 拥塞窗口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拥塞控制"><span class="nav-number">7.</span> <span class="nav-text">拥塞控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#慢启动重启-Slow-Start-Restart-SSR"><span class="nav-number">8.</span> <span class="nav-text">慢启动重启   Slow-Start Restart     SSR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拥塞预防"><span class="nav-number">9.</span> <span class="nav-text">拥塞预防</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BDP-带宽延迟积"><span class="nav-number">10.</span> <span class="nav-text">BDP 带宽延迟积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP队首阻塞-HOL-Head-of-Line"><span class="nav-number">11.</span> <span class="nav-text">TCP队首阻塞  HOL (Head of Line)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抖动"><span class="nav-number">12.</span> <span class="nav-text">抖动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对TCP的调优"><span class="nav-number">13.</span> <span class="nav-text">针对TCP的调优</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

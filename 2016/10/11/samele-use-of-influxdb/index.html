@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="influxdb,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="github: https://github.com/influxdata/influxdb   Deploying InfluxDB using Docker  docker influxdb:      http://www.tomdee.co.uk/2015/10/10/deploying-influxdb-using-docker/ docker pull influxdb docke">
+<meta name="keywords" content="influxdb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="influxdb简单使用">
+<meta property="og:url" content="http://github.com/wangming1993/2016/10/11/samele-use-of-influxdb/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="github: https://github.com/influxdata/influxdb   Deploying InfluxDB using Docker  docker influxdb:      http://www.tomdee.co.uk/2015/10/10/deploying-influxdb-using-docker/ docker pull influxdb docke">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="influxdb简单使用">
+<meta name="twitter:description" content="github: https://github.com/influxdata/influxdb   Deploying InfluxDB using Docker  docker influxdb:      http://www.tomdee.co.uk/2015/10/10/deploying-influxdb-using-docker/ docker pull influxdb docke">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2016/10/11/samele-use-of-influxdb/">
+
+
+
+
+
+  <title>influxdb简单使用 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2016/10/11/samele-use-of-influxdb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">influxdb简单使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-11T20:59:13+00:00">
+                2016-10-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<ul>
+<li>github: <a href="https://github.com/influxdata/influxdb">https://github.com/influxdata/influxdb</a></li>
+</ul>
+</blockquote>
+<h2 id="Deploying-InfluxDB-using-Docker"><a href="#Deploying-InfluxDB-using-Docker" class="headerlink" title="Deploying InfluxDB using Docker"></a>Deploying InfluxDB using Docker</h2><blockquote>
+<ul>
+<li>docker influxdb:      <a href="http://www.tomdee.co.uk/2015/10/10/deploying-influxdb-using-docker/" target="_blank" rel="noopener">http://www.tomdee.co.uk/2015/10/10/deploying-influxdb-using-docker/</a></li>
+<li>docker pull influxdb</li>
+<li>docker run -d –volume=/var/influxdb:/data –restart=always -e PRE_CREATE_DB=”tomdee” -p 8083:8083 -p 8086:8086 influxdb:lastest</li>
+</ul>
+</blockquote>
+<a id="more"></a>
+
+<h1 id="Influxdb-HTTP-API"><a href="#Influxdb-HTTP-API" class="headerlink" title="Influxdb HTTP API"></a>Influxdb HTTP API</h1><blockquote>
+<p><a href="https://docs.influxdata.com/influxdb/v1.0/guides/" target="_blank" rel="noopener">https://docs.influxdata.com/influxdb/v1.0/guides/</a></p>
+</blockquote>
+<p>Influxdb的http api的请求端口为: <code>8086</code></p>
+<h2 id="Writing-Data"><a href="#Writing-Data" class="headerlink" title="Writing Data"></a>Writing Data</h2><blockquote>
+<p><a href="https://docs.influxdata.com/influxdb/v1.0/guides/writing_data/" target="_blank" rel="noopener">https://docs.influxdata.com/influxdb/v1.0/guides/writing_data/</a></p>
+</blockquote>
+<h3 id="create-database"><a href="#create-database" class="headerlink" title="create database"></a>create database</h3><ul>
+<li><code>curl -i -XPOST http://localhost:8086/query --data-urlencode &quot;q=CREATE DATABASE mydb&quot;</code><ul>
+<li>使用POST方法</li>
+<li>url为 <code>/query</code></li>
+<li><code>q</code> 用于设置URL参数</li>
+<li><code>CREATE DATABASE mydb</code>为influxdb的语法</li>
+</ul>
+</li>
+</ul>
+<h3 id="writing-data"><a href="#writing-data" class="headerlink" title="writing data"></a>writing data</h3><ul>
+<li><code>curl -i -XPOST &#39;http://localhost:8086/write?db=mydb&#39; --data-binary &#39;cpu_load_short,host=server01,region=us-west value=0.64 1434055562000000000&#39;</code><ul>
+<li>使用POST方法</li>
+<li>url为 <code>/write</code></li>
+<li><code>db=mydb</code>用于指定db名称</li>
+<li>cpu_load_short 为 <code>measurement</code>， 类似于table, collection的概念</li>
+<li>host,region为tag key</li>
+<li>server01, us-west为tag value</li>
+<li><code>tag key</code>和<code>tag value</code>都会被索引, 类型为<code>string</code></li>
+<li>value为<code>field key</code>, 不会被索引</li>
+<li>0.64为<code>field value</code></li>
+<li>1434055562000000000 为 <code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<p><strong><code>/write</code> api支持一次写入多条数据或者从文件中读取， 但每条数据必须被组织在单行中</strong></p>
+<h2 id="Schema-Design"><a href="#Schema-Design" class="headerlink" title="Schema Design"></a>Schema Design</h2><p>Influxdb是schemaless database(无模式)， 但是对于同一个<code>measurement</code>, <code>tag field</code>对应的<code>tag value</code>的<strong>数据类型必须一致</strong></p>
+<p><code>curl -i -XPOST &#39;http://localhost:8086/write?db=mydb&#39; --data-binary &#39;tobeornottobe booleanonly=true&#39;</code></p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 <span class="number">204</span> No Content</span><br><span class="line"><span class="attribute">Content-Type</span>: application/json</span><br><span class="line"><span class="attribute">Request-Id</span>: 44f427bc-8f57-11e6-8021-000000000000</span><br><span class="line"><span class="attribute">X-Influxdb-Version</span>: 1.0.1</span><br><span class="line"><span class="attribute">Date</span>: Tue, 11 Oct 2016 02:06:06 GMT</span><br></pre></td></tr></table></figure>
+
+<p><code>curl -i -XPOST &#39;http://localhost:8086/write?db=mydb&#39; --data-binary &#39;tobeornottobe booleanonly=5&#39;</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 <span class="number">400</span> Bad Request</span><br><span class="line"><span class="attribute">Content-Type</span>: application/json</span><br><span class="line"><span class="attribute">Request-Id</span>: 4cbc4d09-8f57-11e6-8022-000000000000</span><br><span class="line"><span class="attribute">X-Influxdb-Version</span>: 1.0.1</span><br><span class="line"><span class="attribute">Date</span>: Tue, 11 Oct 2016 02:06:19 GMT</span><br><span class="line"><span class="attribute">Content-Length</span>: 142</span><br><span class="line"></span><br><span class="line">&#123;"error":"field type conflict: input field \"booleanonly\" on measurement \"tobeornottobe\" is type float64, already exists as type boolean"&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Querying-Data"><a href="#Querying-Data" class="headerlink" title="Querying Data"></a>Querying Data</h2><blockquote>
+<p><a href="https://docs.influxdata.com/influxdb/v1.0/guides/querying_data/" target="_blank" rel="noopener">https://docs.influxdata.com/influxdb/v1.0/guides/querying_data/</a></p>
+</blockquote>
+<ul>
+<li><code>curl -GET &#39;http://localhost:8086/query?pretty=true&#39; --data-urlencode &quot;db=mydb&quot; --data-urlencode &quot;q=SELECT \&quot;value\&quot; FROM \&quot;cpu_load_short\&quot; WHERE \&quot;region\&quot;=&#39;us-west&#39;&quot;</code><ul>
+<li>使用GET方法</li>
+<li>url为 <code>/query</code></li>
+<li><code>q</code> 用于设置URL参数</li>
+<li><code>CREATE DATABASE mydb</code>为influxdb的语法</li>
+<li>需要指定db名称</li>
+<li>查询语法中<code>tag key, field key</code>需要使用<code>&quot;&quot;</code>引起来, <code>tag value</code>需要使用<code>&#39;&#39;</code>引起来</li>
+<li><code>pretty=true</code>获取JSON格式的输出</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/influxdb/" rel="tag"># influxdb</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/08/go/golang-useful-knowledge/" rel="next" title="go有用的使用方式">
+                <i class="fa fa-chevron-left"></i> go有用的使用方式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/05/go/go-code-review-comments/" rel="prev" title="go code review comments 【译文】">
+                go code review comments 【译文】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deploying-InfluxDB-using-Docker"><span class="nav-number">1.</span> <span class="nav-text">Deploying InfluxDB using Docker</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Influxdb-HTTP-API"><span class="nav-number"></span> <span class="nav-text">Influxdb HTTP API</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Writing-Data"><span class="nav-number">1.</span> <span class="nav-text">Writing Data</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#create-database"><span class="nav-number">1.1.</span> <span class="nav-text">create database</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#writing-data"><span class="nav-number">1.2.</span> <span class="nav-text">writing data</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Schema-Design"><span class="nav-number">2.</span> <span class="nav-text">Schema Design</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Querying-Data"><span class="nav-number">3.</span> <span class="nav-text">Querying Data</span></a></li></ol></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

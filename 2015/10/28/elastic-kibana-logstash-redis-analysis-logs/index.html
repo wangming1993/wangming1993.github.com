@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="logstash,kibana,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="项目分析mongodb运行时没有将日志文件进行切割, 　随着运行时间的增加, mongod.log越来越大, 已经无法进行有效的数据分析了, 因此需要搭建一个日志分析平台, 可以索引每一条记录, 并能够提供方便快速准确的查询接口网站的每一个访问都会在nginx的日志文件中产生一条记录, 通过kabana可以很好的展现中。">
+<meta name="keywords" content="logstash,kibana">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elastic + kibana + logstash + redis 对mongodb, nginx日志进行分析">
+<meta property="og:url" content="http://github.com/wangming1993/2015/10/28/elastic-kibana-logstash-redis-analysis-logs/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="项目分析mongodb运行时没有将日志文件进行切割, 　随着运行时间的增加, mongod.log越来越大, 已经无法进行有效的数据分析了, 因此需要搭建一个日志分析平台, 可以索引每一条记录, 并能够提供方便快速准确的查询接口网站的每一个访问都会在nginx的日志文件中产生一条记录, 通过kabana可以很好的展现中。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://cloud.githubusercontent.com/assets/5611286/10785282/f39afb46-7d9d-11e5-9c8f-bd8a00e9db48.png">
+<meta property="og:image" content="https://cloud.githubusercontent.com/assets/5611286/10785251/b804181a-7d9d-11e5-8ad0-0e3e7f418882.png">
+<meta property="og:image" content="https://cloud.githubusercontent.com/assets/5611286/10782359/a2bbab2a-7d8a-11e5-98de-92ead6f47169.png">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Elastic + kibana + logstash + redis 对mongodb, nginx日志进行分析">
+<meta name="twitter:description" content="项目分析mongodb运行时没有将日志文件进行切割, 　随着运行时间的增加, mongod.log越来越大, 已经无法进行有效的数据分析了, 因此需要搭建一个日志分析平台, 可以索引每一条记录, 并能够提供方便快速准确的查询接口网站的每一个访问都会在nginx的日志文件中产生一条记录, 通过kabana可以很好的展现中。">
+<meta name="twitter:image" content="https://cloud.githubusercontent.com/assets/5611286/10785282/f39afb46-7d9d-11e5-9c8f-bd8a00e9db48.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2015/10/28/elastic-kibana-logstash-redis-analysis-logs/">
+
+
+
+
+
+  <title>Elastic + kibana + logstash + redis 对mongodb, nginx日志进行分析 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2015/10/28/elastic-kibana-logstash-redis-analysis-logs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elastic + kibana + logstash + redis 对mongodb, nginx日志进行分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-28T19:47:43+00:00">
+                2015-10-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="项目分析"><a href="#项目分析" class="headerlink" title="项目分析"></a>项目分析</h2><p>mongodb运行时没有将日志文件进行切割, 　随着运行时间的增加, mongod.log越来越大, 已经无法进行有效的数据分析了, 因此需要搭建一个日志分析平台, 可以索引每一条记录, 并能够提供方便快速准确的查询接口<br>网站的每一个访问都会在nginx的日志文件中产生一条记录, 通过kabana可以很好的展现中。</p>
+<a id="more"></a>
+
+<h2 id="软件需求"><a href="#软件需求" class="headerlink" title="软件需求"></a>软件需求</h2><h3 id="1-elasticsearch-版本1-7-3-tar-download"><a href="#1-elasticsearch-版本1-7-3-tar-download" class="headerlink" title="1. elasticsearch 版本1.7.3   (tar download)"></a>1. <a href="https://www.elastic.co/downloads/elasticsearch" target="_blank" rel="noopener"><strong>elasticsearch</strong></a> 版本1.7.3   <a href="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.3.tar.gz" target="_blank" rel="noopener"><em>(tar download)</em></a></h3><h3 id="2-kibana-版本-Kibana-4-1-2-64-bit-tar-download"><a href="#2-kibana-版本-Kibana-4-1-2-64-bit-tar-download" class="headerlink" title="2. kibana 版本 Kibana 4.1.2     (64-bit tar download)　"></a>2. <a href="https://www.elastic.co/downloads/kibana" target="_blank" rel="noopener"><strong>kibana</strong></a> 版本 Kibana 4.1.2     <a href="https://download.elastic.co/kibana/kibana/kibana-4.1.2-linux-x64.tar.gz" target="_blank" rel="noopener"><em>(64-bit tar download)</em></a>　</h3><h3 id="3-logstash-版本-Logstash-1-5-4-tar-download"><a href="#3-logstash-版本-Logstash-1-5-4-tar-download" class="headerlink" title="3. logstash 版本 Logstash 1.5.4   (tar download)"></a>3. <a href="https://www.elastic.co/products/logstash" target="_blank" rel="noopener"><strong>logstash</strong></a> 版本 Logstash 1.5.4   <a href="https://download.elastic.co/logstash/logstash/logstash-1.5.4.tar.gz" target="_blank" rel="noopener"><em>(tar download)</em></a></h3><h3 id="4-redis-版本-2-8-4"><a href="#4-redis-版本-2-8-4" class="headerlink" title="4. redis 版本 2.8.4"></a>4. <a href="http://redis.io/download" target="_blank" rel="noopener"><strong>redis</strong></a> 版本 2.8.4</h3><h3 id="5-mongodb-版本-3-0-6"><a href="#5-mongodb-版本-3-0-6" class="headerlink" title="5. mongodb 版本 3.0.6"></a>5. <a href="www.mongodb.org/"><strong>mongodb</strong></a> 版本 3.0.6</h3><h2 id="软件安装"><a href="#软件安装" class="headerlink" title="软件安装"></a>软件安装</h2><h3 id="安装-elasicsearch"><a href="#安装-elasicsearch" class="headerlink" title="安装 elasicsearch"></a>安装 elasicsearch</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf elasticsearch-1.7.3.tar.gz  /home/user/elasticsearch-1.7.3</span><br><span class="line">cd /home/user/elasticsearch-1.7.3/bin</span><br><span class="line">./elasticsearch &amp;</span><br></pre></td></tr></table></figure>
+
+<p>访问　<a href="http://127.0.0.1:9200" target="_blank" rel="noopener">http://127.0.0.1:9200</a><br><img src="https://cloud.githubusercontent.com/assets/5611286/10785282/f39afb46-7d9d-11e5-9c8f-bd8a00e9db48.png" alt="elasticsearch_start"></p>
+<h3 id="安装-kibana"><a href="#安装-kibana" class="headerlink" title="安装 kibana"></a>安装 kibana</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf kibana-4.1.2-linux-x64.tar.gz  /home/user/kibana-4.1.2-linux-x64</span><br><span class="line">cd /home/user/kibana-4.1.2-linux-x64/bin</span><br><span class="line">./kibana &amp;</span><br></pre></td></tr></table></figure>
+
+<p>访问　<a href="http://127.0.0.1:5601/" target="_blank" rel="noopener">http://127.0.0.1:5601/</a></p>
+<h3 id="安装redis"><a href="#安装redis" class="headerlink" title="安装redis"></a>安装redis</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install redis-server</span><br><span class="line">sudo apt-get install php5-redis</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>redis-cli -v</code> 查看安装是否成功</p>
+<h3 id="安装mongodb"><a href="#安装mongodb" class="headerlink" title="安装mongodb"></a>安装mongodb</h3><p><a href="http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/" target="_blank" rel="noopener"><em>安装教程</em></a></p>
+<h2 id="系统架构"><a href="#系统架构" class="headerlink" title="系统架构"></a>系统架构</h2><p><img src="https://cloud.githubusercontent.com/assets/5611286/10785251/b804181a-7d9d-11e5-8ad0-0e3e7f418882.png" alt="struct"></p>
+<h2 id="配置管理"><a href="#配置管理" class="headerlink" title="配置管理"></a>配置管理</h2><h3 id="开启logstash-agent"><a href="#开启logstash-agent" class="headerlink" title="开启logstash agent"></a>开启logstash agent</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">        file &#123;</span><br><span class="line">                type =&gt; "mongo access log"</span><br><span class="line">                path =&gt; ["/var/log/mongodb/mongod.log"]</span><br><span class="line">        &#125;</span><br><span class="line">　　file &#123;</span><br><span class="line">                type =&gt; "nginx access log"</span><br><span class="line">                path =&gt; ["/var/log/nginx/*.log"]</span><br><span class="line">        &#125;　</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">        redis &#123;</span><br><span class="line">                host =&gt; "127.0.0.1" #redis server</span><br><span class="line">                data_type =&gt; "list"</span><br><span class="line">                key =&gt; "logstash:redis"</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以这么理解: logstash 将 <code>/var/log/mongodb/mongod.log</code>　作为输入, 每一次mongod.log文件有改动<br>都会将新添加的内容输出到 output中（这里我们配置的是redis中, 存储的类型为list）</p>
+<h3 id="开启logstash-indexer"><a href="#开启logstash-indexer" class="headerlink" title="开启logstash indexer"></a>开启logstash indexer</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">        redis &#123;</span><br><span class="line">                host =&gt; "127.0.01"</span><br><span class="line">                data_type =&gt; "list"</span><br><span class="line">                key =&gt; "logstash:redis"</span><br><span class="line">                type =&gt; "redis-input"</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">        elasticsearch &#123;</span><br><span class="line">                embedded =&gt; false</span><br><span class="line">                protocol =&gt; "http"</span><br><span class="line">                host =&gt; "localhost"</span><br><span class="line">                port =&gt; "9200"</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将<code>redis</code>中的内容输出到<code>elasticsearch</code></p>
+<h3 id="开启-mongodb的日志追加模式"><a href="#开启-mongodb的日志追加模式" class="headerlink" title="开启 mongodb的日志追加模式"></a>开启 mongodb的日志追加模式</h3><p>开启　<code>verbose = true</code></p>
+<p>操作 <code>mongodb</code>　使产生新的日志，　打开kabana的接口 <code>http://127.0.0.1:5601</code> 即可观察到：</p>
+<p><img src="https://cloud.githubusercontent.com/assets/5611286/10782359/a2bbab2a-7d8a-11e5-98de-92ead6f47169.png" alt="kibana"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/logstash/" rel="tag"># logstash</a>
+          
+            <a href="/tags/kibana/" rel="tag"># kibana</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/28/yii2-coding-style/" rel="next" title="Yii2编码规范">
+                <i class="fa fa-chevron-left"></i> Yii2编码规范
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/11/06/yii2-manual-add-extension/" rel="prev" title="Yii2 手动添加扩展模块 mongodb">
+                Yii2 手动添加扩展模块 mongodb <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#项目分析"><span class="nav-number">1.</span> <span class="nav-text">项目分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件需求"><span class="nav-number">2.</span> <span class="nav-text">软件需求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-elasticsearch-版本1-7-3-tar-download"><span class="nav-number">2.1.</span> <span class="nav-text">1. elasticsearch 版本1.7.3   (tar download)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-kibana-版本-Kibana-4-1-2-64-bit-tar-download"><span class="nav-number">2.2.</span> <span class="nav-text">2. kibana 版本 Kibana 4.1.2     (64-bit tar download)　</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-logstash-版本-Logstash-1-5-4-tar-download"><span class="nav-number">2.3.</span> <span class="nav-text">3. logstash 版本 Logstash 1.5.4   (tar download)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-redis-版本-2-8-4"><span class="nav-number">2.4.</span> <span class="nav-text">4. redis 版本 2.8.4</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-mongodb-版本-3-0-6"><span class="nav-number">2.5.</span> <span class="nav-text">5. mongodb 版本 3.0.6</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件安装"><span class="nav-number">3.</span> <span class="nav-text">软件安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-elasicsearch"><span class="nav-number">3.1.</span> <span class="nav-text">安装 elasicsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-kibana"><span class="nav-number">3.2.</span> <span class="nav-text">安装 kibana</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装redis"><span class="nav-number">3.3.</span> <span class="nav-text">安装redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装mongodb"><span class="nav-number">3.4.</span> <span class="nav-text">安装mongodb</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统架构"><span class="nav-number">4.</span> <span class="nav-text">系统架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置管理"><span class="nav-number">5.</span> <span class="nav-text">配置管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#开启logstash-agent"><span class="nav-number">5.1.</span> <span class="nav-text">开启logstash agent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开启logstash-indexer"><span class="nav-number">5.2.</span> <span class="nav-text">开启logstash indexer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开启-mongodb的日志追加模式"><span class="nav-number">5.3.</span> <span class="nav-text">开启 mongodb的日志追加模式</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

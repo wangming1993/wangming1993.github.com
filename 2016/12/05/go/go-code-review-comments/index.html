@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Go,coding style,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="翻译自：https://github.com/golang/go/wiki/CodeReviewComments  注释 注释应该是一段完整的语句 注释应该以所描述内容的名字开头，并且以句号结尾  声明空的切片应该使用： var t []string,  而不是： t := []string{}前者会避免内存分配，除非使用了append() 不要使用panic对于普通的错误处理，不要使用pani">
+<meta name="keywords" content="Go,coding style">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go code review comments 【译文】">
+<meta property="og:url" content="http://github.com/wangming1993/2016/12/05/go/go-code-review-comments/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="翻译自：https://github.com/golang/go/wiki/CodeReviewComments  注释 注释应该是一段完整的语句 注释应该以所描述内容的名字开头，并且以句号结尾  声明空的切片应该使用： var t []string,  而不是： t := []string{}前者会避免内存分配，除非使用了append() 不要使用panic对于普通的错误处理，不要使用pani">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="go code review comments 【译文】">
+<meta name="twitter:description" content="翻译自：https://github.com/golang/go/wiki/CodeReviewComments  注释 注释应该是一段完整的语句 注释应该以所描述内容的名字开头，并且以句号结尾  声明空的切片应该使用： var t []string,  而不是： t := []string{}前者会避免内存分配，除非使用了append() 不要使用panic对于普通的错误处理，不要使用pani">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2016/12/05/go/go-code-review-comments/">
+
+
+
+
+
+  <title>go code review comments 【译文】 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2016/12/05/go/go-code-review-comments/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">go code review comments 【译文】</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-05T21:07:14+00:00">
+                2016-12-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>翻译自：<a href="https://github.com/golang/go/wiki/CodeReviewComments">https://github.com/golang/go/wiki/CodeReviewComments</a></p>
+</blockquote>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><ul>
+<li>注释应该是一段完整的语句</li>
+<li>注释应该以所描述内容的名字开头，并且以句号结尾</li>
+</ul>
+<h2 id="声明空的切片"><a href="#声明空的切片" class="headerlink" title="声明空的切片"></a>声明空的切片</h2><p>应该使用： <code>var t []string</code>,  而不是： <code>t := []string{}</code><br>前者会避免内存分配，除非使用了<code>append()</code></p>
+<h2 id="不要使用panic"><a href="#不要使用panic" class="headerlink" title="不要使用panic"></a>不要使用<code>panic</code></h2><p>对于普通的错误处理，不要使用<code>panic</code>,使用error和多返回值，</p>
+<ul>
+<li>参考：<a href="https://golang.org/doc/effective_go.html#errors" target="_blank" rel="noopener">https://golang.org/doc/effective_go.html#errors</a></li>
+</ul>
+<a id="more"></a>
+
+<h2 id="错误字符串"><a href="#错误字符串" class="headerlink" title="错误字符串"></a>错误字符串</h2><ul>
+<li>错误字符串不应该大写(除非是专有名词或者缩写)</li>
+<li>不要以符号结尾</li>
+</ul>
+<h2 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h2><p>不要使用<code>_</code>去丢弃error.  当一个函数返回error,去检查并处理error,或者在真正的异常情形下,<code>panic</code></p>
+<h2 id="import"><a href="#import" class="headerlink" title="import"></a><code>import</code></h2><p>将多个<code>import</code>以组划分，用空行来区分组，标准包放在最上面</p>
+<blockquote>
+<p>可以使用<a href="https://godoc.org/golang.org/x/tools/cmd/goimports" target="_blank" rel="noopener">goimports</a>来格式化</p>
+</blockquote>
+<h2 id="import-dot"><a href="#import-dot" class="headerlink" title="import dot"></a>import dot</h2><p>除非在test 文件中有循环依赖而去使用<code>import .</code> 这种形式，否则不要在你的程序中去使用，<br>它使你的程序难以阅读，因为你很难清楚的知道它所处的层级关系。</p>
+<h2 id="缩进错误"><a href="#缩进错误" class="headerlink" title="缩进错误"></a>缩进错误</h2><p>尽量保持正常代码最小的缩进，缩进错误处理代码并且优先处理。<br><strong>尽量采取</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="comment">// error handling</span></span><br><span class="line">    <span class="keyword">return</span> <span class="comment">// or continue, etc.</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// normal code</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>不要</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="comment">// error handling</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// normal code</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="缩写"><a href="#缩写" class="headerlink" title="缩写"></a>缩写</h2><p>缩略应该保持一致，例如： <code>url</code>/<code>URL</code>, 而不是<code>Url</code>, 这个规则同样适用于当<code>ID</code>作为一个标识的时候，使用<code>appID</code>而不是<code>appId</code></p>
+<h2 id="包名"><a href="#包名" class="headerlink" title="包名"></a>包名</h2><p>所有对包内的引用都应该使用包名去访问，因此包内的名称引用可以去掉包名这个标识。<br>例如：包<code>chubby</code>, 不需要使用<code>ChubbyFile</code>, 使用者调用方式为:<code>chubby.ChubbyFil</code>,
+<strong>而是</strong>使用<code>File</code>，使用者调用形式为:<code>chubby.File</code></p>
+<h2 id="接收者类型"><a href="#接收者类型" class="headerlink" title="接收者类型"></a>接收者类型</h2><p>当不知如何抉择值接收还是指针接收时，使用指针接收。但有时值接收是有意义的，尤其是效率因素，对于不常变的小的结构体，基础类型的值。<br>下面是一些有用的指导：</p>
+<ul>
+<li>如果receiver是<code>map</code>,<code>func</code>,<code>chan</code>，不使用指针</li>
+<li>如果receiver是<code>slice</code>,当方法不会重组或重新分配切片，不使用指针</li>
+<li>如果方法需要改变receiver,必须使用指针</li>
+<li>当receiver是包含锁或同步字段时，必须使用指针以避免复制</li>
+<li>对于大的结构体或数组，指针更加的高效</li>
+<li>当外面的改动必须影响到原始的receiver时，必须使用指针</li>
+<li>最后，如果怀疑，那么请使用指针</li>
+</ul>
+<h2 id="变量名称"><a href="#变量名称" class="headerlink" title="变量名称"></a>变量名称</h2><p>在<code>go</code>中变量名应该尽可能的短，尤其是有作用域的局部变量。<br><strong>基本原则</strong>:</p>
+<ul>
+<li>变量越是远离声明，名称越要具有描述性</li>
+<li>全局变量或不常见的应该使用描述性的名称</li>
+<li>对于方法的接收者，一两个字母就足够了</li>
+<li>常见的变量可以使用单个字符，如循环次数i</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Go/" rel="tag"># Go</a>
+          
+            <a href="/tags/coding-style/" rel="tag"># coding style</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/11/samele-use-of-influxdb/" rel="next" title="influxdb简单使用">
+                <i class="fa fa-chevron-left"></i> influxdb简单使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/19/web-performance-authority-guide-TCP/" rel="prev" title="【web性能权威指南】TCP">
+                【web性能权威指南】TCP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#注释"><span class="nav-number">1.</span> <span class="nav-text">注释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#声明空的切片"><span class="nav-number">2.</span> <span class="nav-text">声明空的切片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要使用panic"><span class="nav-number">3.</span> <span class="nav-text">不要使用panic</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误字符串"><span class="nav-number">4.</span> <span class="nav-text">错误字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误处理"><span class="nav-number">5.</span> <span class="nav-text">错误处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#import"><span class="nav-number">6.</span> <span class="nav-text">import</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#import-dot"><span class="nav-number">7.</span> <span class="nav-text">import dot</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缩进错误"><span class="nav-number">8.</span> <span class="nav-text">缩进错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缩写"><span class="nav-number">9.</span> <span class="nav-text">缩写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#包名"><span class="nav-number">10.</span> <span class="nav-text">包名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接收者类型"><span class="nav-number">11.</span> <span class="nav-text">接收者类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量名称"><span class="nav-number">12.</span> <span class="nav-text">变量名称</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Yii2,PHP,Cookie,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="关于 Yii2这里我就不介绍，主要讲的是cookie的使用及遇到的一些问题  客户端与服务器通信，这是一个request与response的过程。在Yii2中分别有yii\web\Request.php 和 yii\web\Response.php 来处理。 其中request处理cookie的逻辑是:">
+<meta name="keywords" content="Yii2,PHP,Cookie">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yii2 中关于cookie使用遇到的问题">
+<meta property="og:url" content="http://github.com/wangming1993/2017/07/27/use-cookie-with-Yii2/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="关于 Yii2这里我就不介绍，主要讲的是cookie的使用及遇到的一些问题  客户端与服务器通信，这是一个request与response的过程。在Yii2中分别有yii\web\Request.php 和 yii\web\Response.php 来处理。 其中request处理cookie的逻辑是:">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Yii2 中关于cookie使用遇到的问题">
+<meta name="twitter:description" content="关于 Yii2这里我就不介绍，主要讲的是cookie的使用及遇到的一些问题  客户端与服务器通信，这是一个request与response的过程。在Yii2中分别有yii\web\Request.php 和 yii\web\Response.php 来处理。 其中request处理cookie的逻辑是:">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2017/07/27/use-cookie-with-Yii2/">
+
+
+
+
+
+  <title>Yii2 中关于cookie使用遇到的问题 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2017/07/27/use-cookie-with-Yii2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Yii2 中关于cookie使用遇到的问题</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-27T22:51:57+00:00">
+                2017-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PHP/" itemprop="url" rel="index">
+                    <span itemprop="name">PHP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>关于 <a href="https://github.com/yiisoft/yii2"><strong>Yii2</strong></a>这里我就不介绍，主要讲的是<a href="https://en.wikipedia.org/wiki/HTTP_cookie" target="_blank" rel="noopener"><strong>cookie</strong></a>的使用及遇到的一些问题</p>
+</blockquote>
+<p>客户端与服务器通信，这是一个<code>request</code>与<code>response</code>的过程。在<code>Yii2</code>中分别有<code>yii\web\Request.php</code> 和 <code>yii\web\Response.php</code> 来处理。</p>
+<p>其中<strong>request</strong>处理<code>cookie</code>的逻辑是:</p>
+<a id="more"></a>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">loadCookies</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $cookies = [];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;enableCookieValidation) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;cookieValidationKey == <span class="string">''</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidConfigException(get_class(<span class="keyword">$this</span>) . <span class="string">'::cookieValidationKey must be configured with a secret key.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">foreach</span> ($_COOKIE <span class="keyword">as</span> $name =&gt; $value) &#123;</span><br><span class="line">            <span class="keyword">if</span> (is_string($value) &amp;&amp; ($value = Yii::$app-&gt;getSecurity()-&gt;validateData($value, <span class="keyword">$this</span>-&gt;cookieValidationKey)) !== <span class="keyword">false</span>) &#123;</span><br><span class="line">                $cookies[$name] = <span class="keyword">new</span> Cookie([</span><br><span class="line">                    <span class="string">'name'</span> =&gt; $name,</span><br><span class="line">                    <span class="string">'value'</span> =&gt; @unserialize($value),</span><br><span class="line">                    <span class="string">'expire'</span>=&gt; <span class="keyword">null</span></span><br><span class="line">                ]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">foreach</span> ($_COOKIE <span class="keyword">as</span> $name =&gt; $value) &#123;</span><br><span class="line">            $cookies[$name] = <span class="keyword">new</span> Cookie([</span><br><span class="line">                <span class="string">'name'</span> =&gt; $name,</span><br><span class="line">                <span class="string">'value'</span> =&gt; $value,</span><br><span class="line">                <span class="string">'expire'</span>=&gt; <span class="keyword">null</span></span><br><span class="line">            ]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $cookies;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里<strong>request</strong>从<code>PHP</code>的全局变量<code>$_COOKIE</code>中获取客户端传的<code>cookie</code>, 构造<code>yii\web\Cookie</code>对象，而<strong>这个对象只有name和value属性赋值了</strong></p>
+<p><strong>response</strong>中处理<code>cookie</code>的逻辑是:</p>
+<p>首先通过<code>Yii::$app-&gt;response-&gt;cookies</code> 调用<code>yii\web\CookieCollection.php</code>:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getCookies</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;_cookies === <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_cookies = <span class="keyword">new</span> CookieCollection;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_cookies;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不论是新增,还是删除，修改<code>cookie</code>，都是通过将<code>cookie</code>赋值给<code>Yii::$app-&gt;response-&gt;cookies</code></p>
+<p>最后<strong>response</strong>通过<code>sendCookies()</code>返回给客户端:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">sendCookies</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;_cookies === <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    $request = Yii::$app-&gt;getRequest();</span><br><span class="line">    <span class="keyword">if</span> ($request-&gt;enableCookieValidation) &#123;</span><br><span class="line">        <span class="keyword">if</span> ($request-&gt;cookieValidationKey == <span class="string">''</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidConfigException(get_class($request) . <span class="string">'::cookieValidationKey must be configured with a secret key.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        $validationKey = $request-&gt;cookieValidationKey;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">foreach</span> (<span class="keyword">$this</span>-&gt;getCookies() <span class="keyword">as</span> $cookie) &#123;</span><br><span class="line">        $value = $cookie-&gt;value;</span><br><span class="line">        <span class="keyword">if</span> ($cookie-&gt;expire != <span class="number">1</span>  &amp;&amp; <span class="keyword">isset</span>($validationKey)) &#123;</span><br><span class="line">            $value = Yii::$app-&gt;getSecurity()-&gt;hashData(serialize($value), $validationKey);</span><br><span class="line">        &#125;</span><br><span class="line">        setcookie($cookie-&gt;name, $value, $cookie-&gt;expire, $cookie-&gt;path, $cookie-&gt;domain, $cookie-&gt;secure, $cookie-&gt;httpOnly);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;getCookies()-&gt;removeAll();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>默认的我们的<code>cookie</code>是写到当前域名下面的</strong>,  对于一般场景这是没问题的。当时对于前后端分离的应用，尤其是前后端域名不一致的场景，就会出现问题。</p>
+<p>假定现在有一个应用采用前后端分离的架构，前端域名为: <code>mike.com</code>, 后端域名为: <code>api.mike.com</code>. 后端使用<code>cookie</code> 存储用户名:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"user_name"</span>,</span><br><span class="line">    <span class="attr">"value"</span>: <span class="string">"mike"</span>,</span><br><span class="line">    <span class="attr">"domain"</span>: <span class="string">".mike.com"</span>,</span><br><span class="line">    <span class="attr">"path"</span>: <span class="string">"/"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><a href="http://php.net/manual/zh/function.setcookie.php" target="_blank" rel="noopener">http://php.net/manual/zh/function.setcookie.php</a></p>
+</blockquote>
+<p>前台登录，调用API <code>http://api.mike.com/site/login</code>, 后台代码:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">actionLogin</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">      <span class="comment">// validate username and passwd</span></span><br><span class="line">      <span class="comment">// set cookie</span></span><br><span class="line"></span><br><span class="line">      $cookie = <span class="keyword">new</span> yii\web\Cookie();</span><br><span class="line">      $cookie-&gt;name = <span class="string">'user_name'</span>;</span><br><span class="line">      $cookie-&gt;value = <span class="string">'mike'</span>;</span><br><span class="line">      $cookie-&gt;domain = <span class="string">'mike.com'</span>;</span><br><span class="line">      <span class="comment">// 注意这里的domain不能不填，否则会使用api.mike.com, 这样mike.com就不会拿到cookie</span></span><br><span class="line">      Yii::$app-&gt;response-&gt;cookies-&gt;add($cookie);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当前台退出登录，调用API <code>http://api.mike.com/site/logout</code> 清除cookie, 后台代码如下:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">actionLogout</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Yii::$app-&gt;response-&gt;cookies-&gt;remove(<span class="string">'user_name'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>你以为你清除了cookie user_name, 然而并不是这样</strong>， 你可以通过<strong>chrome</strong>浏览器<code>F12</code> 在<code>Application</code>中查看当前域名下面存在的<code>cookie</code></p>
+<p> 为什么会不会删除呢？ 让我们先看看<code>reomve</code>的逻辑:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">remove</span><span class="params">($cookie, $removeFromBrowser = true)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;readOnly) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InvalidCallException(<span class="string">'The cookie collection is read only.'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ($cookie <span class="keyword">instanceof</span> Cookie) &#123;</span><br><span class="line">        $cookie-&gt;expire = <span class="number">1</span>;</span><br><span class="line">        $cookie-&gt;value = <span class="string">''</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $cookie = <span class="keyword">new</span> Cookie([</span><br><span class="line">            <span class="string">'name'</span> =&gt; $cookie,</span><br><span class="line">            <span class="string">'expire'</span> =&gt; <span class="number">1</span>,</span><br><span class="line">        ]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ($removeFromBrowser) &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_cookies[$cookie-&gt;name] = $cookie;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">unset</span>(<span class="keyword">$this</span>-&gt;_cookies[$cookie-&gt;name]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果传的不是一个<code>Cookie</code>对象，那么会构造一个<code>Cookie</code>对象，设置<code>expire</code>, 添加到response中，服务器收到一个<code>expire = 1</code>的<code>cookie</code>, 就会从本地删除，之后的请求就不会带这个name的<code>cookie</code>了。问题在于<strong>重新构造的cookie没有指定domain, 那么就会用当前域名api.mike.com； 可是login写的cookie domain为mike.com, 虽然name相同，都是user_name, 但是domain不同，浏览器不认为是一个cookie, 所以login写入的cookie不会被删除</strong>,</p>
+<p>改进后的代码:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">actionLogout</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $cookie = <span class="keyword">new</span> yii\web\Cookie();</span><br><span class="line">    $cookie-&gt;domain = <span class="string">'mike.com'</span>;</span><br><span class="line">    $cookie-&gt;name = <span class="string">'user_name'</span>;</span><br><span class="line">    Yii::$app-&gt;response-&gt;cookies-&gt;remove($cookie);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实不仅<code>remove</code>, 去更新cookie的时候也是会存在这个问题的。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//错误做法</span></span><br><span class="line">$cookie = Yii::$app-&gt;request-&gt;cookies-&gt;get(<span class="string">'user_name'</span>);</span><br><span class="line">$cookie-&gt;expire = <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>;     <span class="comment">// 更新cookie过期时间</span></span><br><span class="line">Yii::$app-&gt;response-&gt;cookies-&gt;add($cookie);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这种做法也会存在两个同名的cookie</span></span><br><span class="line"><span class="comment">// 一个domain为: api.mike.com; 一个为: mike.com</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//正确做法</span></span><br><span class="line">$cookie = Yii::$app-&gt;request-&gt;cookies-&gt;get(<span class="string">'user_name'</span>);</span><br><span class="line">$cookie-&gt;expire = <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>;     <span class="comment">// 更新cookie过期时间</span></span><br><span class="line">$cookie-&gt;domain = <span class="string">'mike.com'</span>;</span><br><span class="line">Yii::$app-&gt;response-&gt;cookies-&gt;add($cookie);</span><br></pre></td></tr></table></figure>
+
+<p><strong>需要注意的是Yii2从request里面获取的cookie对象只有name,value属性值，如果domain不是当前域，那么需要重新指定</strong></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Yii2/" rel="tag"># Yii2</a>
+          
+            <a href="/tags/PHP/" rel="tag"># PHP</a>
+          
+            <a href="/tags/Cookie/" rel="tag"># Cookie</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/16/config-mongodb-replicaSet-with-docker/" rel="next" title="在docker容器内使用容器外的mongodb的复制集">
+                <i class="fa fa-chevron-left"></i> 在docker容器内使用容器外的mongodb的复制集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/28/macos-gem-install/" rel="prev" title="Mac OS gem install 问题">
+                Mac OS gem install 问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

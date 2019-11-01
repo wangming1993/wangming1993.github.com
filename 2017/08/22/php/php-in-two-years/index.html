@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="php,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="自动类加载 (auto-load)自动类加载说白了就是自动 include / require php 文件，这里以: Aliyun_Log_Client 为例说明。 如果想使用 Aliyun_Log_Client 这个类， 需要先 : 1require_once(&apos;aliyun/Aliyun/Log/Client.php&apos;);  这里你不仅需要手动 require, 还需要知道 php 文件的相">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于PHP, 我学到了什么">
+<meta property="og:url" content="http://github.com/wangming1993/2017/08/22/php/php-in-two-years/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="自动类加载 (auto-load)自动类加载说白了就是自动 include / require php 文件，这里以: Aliyun_Log_Client 为例说明。 如果想使用 Aliyun_Log_Client 这个类， 需要先 : 1require_once(&apos;aliyun/Aliyun/Log/Client.php&apos;);  这里你不仅需要手动 require, 还需要知道 php 文件的相">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于PHP, 我学到了什么">
+<meta name="twitter:description" content="自动类加载 (auto-load)自动类加载说白了就是自动 include / require php 文件，这里以: Aliyun_Log_Client 为例说明。 如果想使用 Aliyun_Log_Client 这个类， 需要先 : 1require_once(&apos;aliyun/Aliyun/Log/Client.php&apos;);  这里你不仅需要手动 require, 还需要知道 php 文件的相">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2017/08/22/php/php-in-two-years/">
+
+
+
+
+
+  <title>关于PHP, 我学到了什么 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2017/08/22/php/php-in-two-years/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于PHP, 我学到了什么</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-22T19:01:52+00:00">
+                2017-08-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/php/" itemprop="url" rel="index">
+                    <span itemprop="name">php</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="自动类加载-auto-load"><a href="#自动类加载-auto-load" class="headerlink" title="自动类加载 (auto-load)"></a>自动类加载 (auto-load)</h2><p>自动类加载说白了就是自动 <code>include</code> / <code>require</code> php 文件，这里以: <code>Aliyun_Log_Client</code> 为例说明。</p>
+<p>如果想使用 <code>Aliyun_Log_Client</code> 这个类， 需要先 :</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require_once</span>(<span class="string">'aliyun/Aliyun/Log/Client.php'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这里你不仅需要手动 <code>require</code>, 还需要知道 <code>php</code> 文件的相对位置。</p>
+<p>但是如果实现了自动类加载呢， 你只需要 </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">Aliyun_Log_Client</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我们知道 <code>PHP</code> 执行的本质还是需要将依赖的 <code>php</code> 文件都加载在一起，那么自动类加载是如何做到的呢？</p>
+<p>主要需要做两件事：</p>
+<ol>
+<li><code>spl_autoload_register</code> 注册一个解析 <code>class</code> 名的函数</li>
+<li>根据 <code>class</code> 名找到对应的 <code>php</code> 文件并调用 <code>require</code></li>
+</ol>
+<a id="more"></a>
+
+<p>这里看 <code>Aliyun_Log</code> 是如何实现的:</p>
+<p><strong>Log_Autoload.php</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Copyright (C) Alibaba Cloud Computing</span></span><br><span class="line"><span class="comment"> * All rights reserved</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line">$version = <span class="string">'0.6.0'</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Aliyun_Log_PHP_Client_Autoload</span><span class="params">($className)</span> </span>&#123;</span><br><span class="line">    $classPath = explode(<span class="string">'_'</span>, $className);</span><br><span class="line">    <span class="keyword">if</span> ($classPath[<span class="number">0</span>] == <span class="string">'Aliyun'</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span>(count($classPath)&gt;<span class="number">4</span>)</span><br><span class="line">            $classPath = array_slice($classPath, <span class="number">0</span>, <span class="number">4</span>);</span><br><span class="line">        $filePath = dirname(<span class="keyword">__FILE__</span>) . <span class="string">'/'</span> . implode(<span class="string">'/'</span>, $classPath) . <span class="string">'.php'</span>;</span><br><span class="line">        <span class="keyword">if</span> (file_exists($filePath))</span><br><span class="line">            <span class="keyword">require_once</span>($filePath);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">spl_autoload_register(<span class="string">'Aliyun_Log_PHP_Client_Autoload'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>然后你需要在代码执行之前 <code>require</code> 这个文件。</p>
+<p><em>懂得了这个，你就可以组织自己的代码结构，定义自己的命名习惯，并且可以很方便的给别人使用.</em></p>
+<h2 id="魔术方法-magic-method"><a href="#魔术方法-magic-method" class="headerlink" title="魔术方法 (magic method)"></a>魔术方法 (magic method)</h2><p>如: <code>__get()</code>, <code>__set()</code>. <code>__isset</code>, <code>__unset</code>, <code>__call</code>, <code>__callstatic</code> 这些方法，在实现框架代码时是很常见且常用的，知道什么时候这些魔术方法会被调用，以及它能用来做什么事情，对于一个 <code>PHPer</code> 来说很标配。以 <code>__get()</code>, <code>__set()</code> 来例:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Object</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $data;</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__get</span><span class="params">($name)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;data[$name]) || array_key_exists($name, <span class="keyword">$this</span>-&gt;data)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;data[$name];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__set</span><span class="params">($name, $value)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;data[$name] = $value;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">  	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__isset</span><span class="params">($name)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;__get($name) !== <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，<code>Object</code> 具有的属性就可以动态扩展了， 如:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ob = <span class="keyword">new</span> Object();</span><br><span class="line">$ob-&gt;name = <span class="string">'mike'</span>;</span><br><span class="line">$ob-&gt;age = <span class="number">25</span>;</span><br></pre></td></tr></table></figure>
+
+<p>那它有什么用武之地呢？ </p>
+<p>它可以作为一个基类，来封装对数据库的操作，实现自己的 <code>ORM</code> 框架, 如:</p>
+<p><strong>DB.php</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DB</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">insert</span><span class="params">($collectionName, $data)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 创建 mongodb 的连接 $mongodbConnection</span></span><br><span class="line">        $mongodbConnection-&gt;getCollection($collection)-&gt;insert($data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Model.php</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Model</span> <span class="keyword">extends</span> <span class="title">Object</span> </span>&#123;</span><br><span class="line">    pubic <span class="function"><span class="keyword">function</span> <span class="title">save</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $className = get_class();</span><br><span class="line">      	$collectionName = strtolower($cl);</span><br><span class="line">        <span class="comment">// 根据 $collectionName 可以连接选择数据库 table(mysql), collection(mongodb)</span></span><br><span class="line">        DB::insert($collectionName, <span class="keyword">$this</span>-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Test</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">extends</span> <span class="title">Model</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Order</span> <span class="keyword">extends</span> <span class="title">Model</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">$user = <span class="keyword">new</span> User();</span><br><span class="line">$user-&gt;name = <span class="string">'mike'</span>;</span><br><span class="line">$user-&gt;age = <span class="number">25</span>;</span><br><span class="line">$user-&gt;languages = [<span class="string">'php'</span>, <span class="string">'golang'</span>];</span><br><span class="line">$user-&gt;save();  <span class="comment">// 向 mongodb 的 user collection 中插入一条数据</span></span><br><span class="line"></span><br><span class="line">$order = <span class="keyword">new</span> Order();</span><br><span class="line">$order-&gt;orderNumber = <span class="string">'P201708220001'</span>;</span><br><span class="line">$order-&gt;price = <span class="string">'100'</span>;</span><br><span class="line">$order-&gt;name = <span class="string">'爱茜茜里甜品'</span>;</span><br><span class="line">$order-&gt;save(); <span class="comment">// 向 mongodb 的 order collection 中插入一条数据</span></span><br></pre></td></tr></table></figure>
+
+<p>当然这里说的只是一个例子， 真正的框架要做的事很多，但是原理性的东西就是那些。</p>
+<h2 id="static-与-self"><a href="#static-与-self" class="headerlink" title="static 与 self"></a><code>static</code> 与 <code>self</code></h2><ul>
+<li><p><code>self</code> 正如其名字，指向的是当前类</p>
+</li>
+<li><p><code>static</code> 指向的则是实际调用类</p>
+</li>
+</ul>
+<p>看下面的示例:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">say</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">static</span>::hint();</span><br><span class="line">        <span class="keyword">self</span>::info();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">hint</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"hint A \n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">info</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"info A \n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> <span class="keyword">extends</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">hint</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"hint B \n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">info</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"info B \n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$test = <span class="keyword">new</span> B();</span><br><span class="line">$test-&gt;say();</span><br></pre></td></tr></table></figure>
+
+<p>最后的输出结果为:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hint B   // 使用 static 调用时会调用父类同名方法</span><br><span class="line">info A   // 使用 self 只会调用当前类，而不是调用类的方法</span><br></pre></td></tr></table></figure>
+
+<p>清楚了 <code>self</code>, <code>static</code>的作用方法，在看一些框架代码，或者自己写具有层级关系的代码时，考虑一些方法的作用域时，就可以通过<code>static</code> , <code>self</code> 来决定子类是否可以覆盖父类同名方法了。</p>
+<h2 id="php-cli-与-php-fpm"><a href="#php-cli-与-php-fpm" class="headerlink" title="php-cli 与 php-fpm"></a><code>php-cli</code> 与 <code>php-fpm</code></h2><ul>
+<li><code>PHP CLI</code> 是命令行接口, 是位于创建独立的程序 （如：在命令行运行一个php文件，执行一些耗时的操作）</li>
+<li><code>PHP CGI</code> 是 <code>PHP CGI</code> (通用网关接口) 的一种实现，主要是用于 web 应用。</li>
+</ul>
+<p>举一些常见的区别:</p>
+<ul>
+<li><code>pcntl_fork</code> 命令只能做 <code>cli</code> 模式，不能再 <code>fpm</code>模式</li>
+<li><code>$_SERVER</code>，<code>$_POST</code> 这些 这些全局变量就只能在 <code>fpm</code> 模式下有效， 在 <code>cli</code> 下不存在</li>
+</ul>
+<h2 id="composer"><a href="#composer" class="headerlink" title="composer"></a><code>composer</code></h2><p><code>composer</code>  是 <code>PHP</code>的一个包依赖管理， 定义了一下自动加载规范，可以下载,管理依赖.</p>
+<h2 id="匿名函数，-闭包"><a href="#匿名函数，-闭包" class="headerlink" title="匿名函数， 闭包"></a>匿名函数， 闭包</h2><h2 id="trait"><a href="#trait" class="headerlink" title="trait"></a><code>trait</code></h2><p>用于定义一些方法集，可以被其它类使用，感觉主要是为了解决不能多继承的问题</p>
+<h2 id="命名空间-namespace"><a href="#命名空间-namespace" class="headerlink" title="命名空间 (namespace)"></a>命名空间 (<code>namespace</code>)</h2><p>与文件系统中的目录结构类似，可以用来区分同名文件</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/php/" rel="tag"># php</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/20/go/slice/" rel="next" title="golang 的分片">
+                <i class="fa fa-chevron-left"></i> golang 的分片
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/05/backend/lock/" rel="prev" title="锁相关知识">
+                锁相关知识 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#自动类加载-auto-load"><span class="nav-number">1.</span> <span class="nav-text">自动类加载 (auto-load)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#魔术方法-magic-method"><span class="nav-number">2.</span> <span class="nav-text">魔术方法 (magic method)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#static-与-self"><span class="nav-number">3.</span> <span class="nav-text">static 与 self</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#php-cli-与-php-fpm"><span class="nav-number">4.</span> <span class="nav-text">php-cli 与 php-fpm</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#composer"><span class="nav-number">5.</span> <span class="nav-text">composer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#匿名函数，-闭包"><span class="nav-number">6.</span> <span class="nav-text">匿名函数， 闭包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#trait"><span class="nav-number">7.</span> <span class="nav-text">trait</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命名空间-namespace"><span class="nav-number">8.</span> <span class="nav-text">命名空间 (namespace)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

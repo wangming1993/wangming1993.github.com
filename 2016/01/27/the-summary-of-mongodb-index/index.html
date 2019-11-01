@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="mongodb,索引,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="MongoDB Indexes 默认 _id 会作为collection的索引 对于单个字段的索引, 排序方向并不影响索引的使用 嵌入文档的索引,必须要完全匹配 对于复合索引,可以匹配任意带有前缀的查询">
+<meta name="keywords" content="mongodb,索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MongoDB 索引小结">
+<meta property="og:url" content="http://github.com/wangming1993/2016/01/27/the-summary-of-mongodb-index/index.html">
+<meta property="og:site_name" content="痕无落">
+<meta property="og:description" content="MongoDB Indexes 默认 _id 会作为collection的索引 对于单个字段的索引, 排序方向并不影响索引的使用 嵌入文档的索引,必须要完全匹配 对于复合索引,可以匹配任意带有前缀的查询">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-01T09:22:08.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MongoDB 索引小结">
+<meta name="twitter:description" content="MongoDB Indexes 默认 _id 会作为collection的索引 对于单个字段的索引, 排序方向并不影响索引的使用 嵌入文档的索引,必须要完全匹配 对于复合索引,可以匹配任意带有前缀的查询">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://github.com/wangming1993/2016/01/27/the-summary-of-mongodb-index/">
+
+
+
+
+
+  <title>MongoDB 索引小结 | 痕无落</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">痕无落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://github.com/wangming1993/2016/01/27/the-summary-of-mongodb-index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangming">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="痕无落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MongoDB 索引小结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-27T20:12:55+00:00">
+                2016-01-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="MongoDB-Indexes"><a href="#MongoDB-Indexes" class="headerlink" title="MongoDB Indexes"></a>MongoDB Indexes</h1><ul>
+<li>默认 _id 会作为collection的索引</li>
+<li>对于单个字段的索引, 排序方向并不影响索引的使用</li>
+<li>嵌入文档的索引,必须要完全匹配</li>
+<li>对于复合索引,可以匹配任意带有前缀的查询</li>
+</ul>
+<a id="more"></a>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">"item"</span>: <span class="number">1</span>, <span class="attr">"location"</span>: <span class="number">1</span>, <span class="attr">"stock"</span>: <span class="number">1</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p> 支持:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123; item: 1 &#125;</span><br><span class="line">&#123; item: 1, location: 1 &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>排序</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.events.createIndex( &#123; <span class="string">"username"</span> : <span class="number">1</span>, <span class="string">"date"</span> : <span class="number">-1</span> &#125; )</span><br></pre></td></tr></table></figure>
+
+<p>支持sort:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db.events.find().sort( &#123; <span class="attr">username</span>: <span class="number">-1</span>, <span class="attr">date</span>: <span class="number">1</span> &#125; )</span><br><span class="line">db.events.find().sort( &#123; <span class="attr">username</span>: <span class="number">1</span>, <span class="attr">date</span>: <span class="number">-1</span> &#125; )</span><br></pre></td></tr></table></figure>
+
+<p>不支持:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.events.find().sort( &#123; <span class="attr">username</span>: <span class="number">1</span>, <span class="attr">date</span>: <span class="number">1</span> &#125; )</span><br></pre></td></tr></table></figure>
+
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><blockquote>
+<p>MongoDB 版本</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~ » mongo --version                                     </span><br><span class="line">MongoDB shell version: 3.0.8</span><br></pre></td></tr></table></figure>
+
+<h3 id="单个索引"><a href="#单个索引" class="headerlink" title="单个索引"></a>单个索引</h3><blockquote>
+<p>创建订单表, 插入10000条数据</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">~ » mongo</span><br><span class="line">for(var i = 0; i &lt; 10000; i++) &#123; </span><br><span class="line">    db.order.insert(&#123;"sku": i+1, "cid": 10000 - i&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>根据sku查询, 使用<strong>explain()</strong>进行分析</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.order.find(&#123;<span class="string">"sku"</span>:<span class="number">100</span>&#125;).explain()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"queryPlanner"</span> : &#123;</span><br><span class="line">        <span class="attr">"plannerVersion"</span> : <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"namespace"</span> : <span class="string">"test.order"</span>,</span><br><span class="line">        <span class="attr">"indexFilterSet"</span> : <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"parsedQuery"</span> : &#123;</span><br><span class="line">            <span class="attr">"sku"</span> : &#123;</span><br><span class="line">                <span class="attr">"$eq"</span> : <span class="number">100</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"winningPlan"</span> : &#123;</span><br><span class="line">            <span class="attr">"stage"</span> : <span class="string">"COLLSCAN"</span>,</span><br><span class="line">            <span class="attr">"filter"</span> : &#123;</span><br><span class="line">                <span class="attr">"sku"</span> : &#123;</span><br><span class="line">                    <span class="attr">"$eq"</span> : <span class="number">100</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"direction"</span> : <span class="string">"forward"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"rejectedPlans"</span> : [ ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"ok"</span> : <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>观察到 winningPlan 的 stage 为 <strong>COLLSCAN</strong> 为 <strong>全表扫描</strong></p>
+<blockquote>
+<p>添加索引 </p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.order.ensureIndex(&#123;<span class="string">"sku"</span>:<span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>再次根据sku查询</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&gt; db.order.find(&#123;<span class="string">"sku"</span>:<span class="number">100</span>&#125;).explain()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"queryPlanner"</span> : &#123;</span><br><span class="line">        <span class="string">"plannerVersion"</span> : <span class="number">1</span>,</span><br><span class="line">        <span class="string">"namespace"</span> : <span class="string">"test.order"</span>,</span><br><span class="line">        <span class="string">"indexFilterSet"</span> : <span class="literal">false</span>,</span><br><span class="line">        <span class="string">"parsedQuery"</span> : &#123;</span><br><span class="line">            <span class="string">"sku"</span> : &#123;</span><br><span class="line">                <span class="string">"$eq"</span> : <span class="number">100</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"winningPlan"</span> : &#123;</span><br><span class="line">            <span class="string">"stage"</span> : <span class="string">"FETCH"</span>,</span><br><span class="line">            <span class="string">"inputStage"</span> : &#123;</span><br><span class="line">                <span class="string">"stage"</span> : <span class="string">"IXSCAN"</span>,</span><br><span class="line">                <span class="string">"keyPattern"</span> : &#123;</span><br><span class="line">                    <span class="string">"sku"</span> : <span class="number">1</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">"indexName"</span> : <span class="string">"sku_1"</span>,</span><br><span class="line">                <span class="string">"isMultiKey"</span> : <span class="literal">false</span>,</span><br><span class="line">                <span class="string">"direction"</span> : <span class="string">"forward"</span>,</span><br><span class="line">                <span class="string">"indexBounds"</span> : &#123;</span><br><span class="line">                    <span class="string">"sku"</span> : [</span><br><span class="line">                        <span class="string">"[100.0, 100.0]"</span></span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"rejectedPlans"</span> : [ ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>发现现在 stage 为 <strong>IXSCAN</strong>, 意为 index scan, 索引扫描, 此时利用了索引</p>
+<h3 id="复合索引"><a href="#复合索引" class="headerlink" title="复合索引"></a>复合索引</h3><blockquote>
+<p>创建collection, 添加数据</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++) &#123; </span><br><span class="line">    db.order_2.insert(&#123;<span class="string">"sku"</span>:i+<span class="number">1</span>, <span class="string">"cid"</span>:<span class="number">9999</span>-i&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>添加复合索引 <code>sku_1_cid_1</code></p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.order_2.ensureIndex(&#123;<span class="string">"sku"</span>:<span class="number">1</span>, <span class="string">"cid"</span>:<span class="number">1</span>&#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>观察现象</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">查询条件</th>
+<th align="center">查找方式</th>
+<th align="center">是否使用索引</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">sku : 100</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="center">cid : 100</td>
+<td align="center">COLLSCAN</td>
+<td align="center">否</td>
+</tr>
+<tr>
+<td align="center">sku:2, cid:9998</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="center">cid:2, sku:9998</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>4个字段组成的复合索引支持的查询类型</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++) &#123; </span><br><span class="line">    db.order_4.insert(&#123;<span class="string">"sku"</span>:i+<span class="number">1</span>, <span class="string">"cid"</span>:<span class="number">9999</span>-i, <span class="string">"status"</span>: i * <span class="number">100</span>, <span class="string">"order"</span> : i&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.order_4.ensureIndex(&#123;<span class="string">"sku"</span>:<span class="number">1</span>,<span class="string">"cid"</span>:<span class="number">1</span>,<span class="string">"status"</span>:<span class="number">1</span>,<span class="string">"order"</span>:<span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>索引 <code>sku_1_cid_1_status_1_order_1</code> </p>
+<table>
+<thead>
+<tr>
+<th align="left">查询条件</th>
+<th align="center">查找方式</th>
+<th align="center">是否使用索引</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">sku : 100</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">cid : 100</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">status : 100</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">order : 100</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="left">sku:2, cid:9998</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">sku:9998, status: 100</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">sku:9998, order: 100</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">cid:1, status:100</td>
+<td align="center">COLLSCAN</td>
+<td align="center">否</td>
+</tr>
+<tr>
+<td align="left">cid:1, order: 0</td>
+<td align="center">COLLSCAN</td>
+<td align="center">否</td>
+</tr>
+<tr>
+<td align="left">status:100, order:1</td>
+<td align="center">COLLSCAN</td>
+<td align="center">否</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="left">sku:1,cid:100,status:1</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">sku:1,cid:100,order:1</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">sku:1,status:100,order:0</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="left">cid:1,status:100,order:0</td>
+<td align="center">COLLSCAN</td>
+<td align="center">否</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="left">sku:1,cid:100,status:1,order:1</td>
+<td align="center">IXSCAN</td>
+<td align="center">是</td>
+</tr>
+</tbody></table>
+<p>综上所述:</p>
+<ul>
+<li>是否使用索引与查询条件的顺序无关</li>
+<li>创建索引时指定的字段顺序很重要</li>
+<li>只要查询条件满足索引的前缀就会使用索引</li>
+<li>确保你创建的复合索引在大部分的查询语句中使用到前缀(包含最前面的字段)</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mongodb/" rel="tag"># mongodb</a>
+          
+            <a href="/tags/索引/" rel="tag"># 索引</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/27/use-optimistic-lock-with-mongodb/" rel="next" title="MongoDB中关于乐观锁的一些使用">
+                <i class="fa fa-chevron-left"></i> MongoDB中关于乐观锁的一些使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/03/the-summary-of-linux-shell/" rel="prev" title="linux shell">
+                linux shell <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/5611286?s=460&v=4" alt="wangming">
+          <p class="site-author-name" itemprop="name">wangming</p>
+           
+              <p class="site-description motion-element" itemprop="description">做一个高产的程序员</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wangming1993" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.weibo.com/6094203318/profile" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MongoDB-Indexes"><span class="nav-number">1.</span> <span class="nav-text">MongoDB Indexes</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实验"><span class="nav-number">1.1.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单个索引"><span class="nav-number">1.1.1.</span> <span class="nav-text">单个索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复合索引"><span class="nav-number">1.1.2.</span> <span class="nav-text">复合索引</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangming</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
